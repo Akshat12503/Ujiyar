@@ -1,0 +1,76 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200/60 space-y-6">
+      <div>
+        <h3 class="text-xl font-bold text-slate-800">How is your mind space right now?</h3>
+        <p class="text-slate-500 text-sm mt-0.5">Select the emotion that closely mirrors your baseline check-in state.</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <button 
+          *ngFor="let mood of moods" 
+          (click)="selectMood(mood)"
+          type="button"
+          [class]="selectedMood?.label === mood.label ? mood.colorClass + ' ring-2 ring-offset-2 ring-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
+          class="flex flex-col items-center p-4 border rounded-xl transition-all duration-200 group text-center">
+          <span class="text-2xl group-hover:scale-110 transition-transform duration-200 mb-1">{{ mood.emoji }}</span>
+          <span class="text-xs font-semibold tracking-wide">{{ mood.label }}</span>
+        </button>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Self-Reflection Journal</label>
+        <textarea 
+          [(ngModel)]="journalText"
+          rows="4"
+          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-wellness-primary/20 focus:border-wellness-primary text-slate-700 transition text-sm resize-none"
+          placeholder="Pour your thoughts onto the canvas safely... What brought you to this feeling today?"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+        <label class="flex items-center space-x-2 cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="isAnonymous"
+            class="h-4 w-4 rounded text-wellness-primary focus:ring-wellness-primary border-slate-300">
+          <span class="text-xs text-slate-500 font-medium">Keep this journal private to my local safe space</span>
+        </label>
+
+        <button 
+          (click)="saveReflection()"
+          [disabled]="!selectedMood"
+          class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white font-medium rounded-xl text-xs transition shadow-sm">
+          Log Entry Check-in
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    <h4 class="text-sm font-bold uppercase tracking-wider text-slate-400">Recent Reflections</h4>
+    
+    <div *ngIf="loggedEntries.length === 0" class="bg-white/60 border border-dashed border-slate-300 p-8 rounded-2xl text-center text-slate-400 text-xs">
+      No reflections logged today yet. Your timeline feed will update here in real-time.
+    </div>
+
+    <div 
+      *ngFor="let entry of loggedEntries" 
+      class="bg-white p-5 rounded-xl shadow-xs border border-slate-200/60 space-y-2 animate-fade-in">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">{{ entry.mood.emoji }}</span>
+          <span class="text-xs font-bold text-slate-700">{{ entry.mood.label }}</span>
+        </div>
+        <span class="text-[10px] font-medium text-slate-400">{{ entry.date | date:'shortTime' }}</span>
+      </div>
+      <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed break-words" *ngIf="entry.note">
+        {{ entry.note }}
+      </p>
+      <div class="text-[10px] text-slate-400 italic flex items-center space-x-1" *ngIf="entry.private">
+        <span>🔒 Shared only locally</span>
+      </div>
+    </div>
+  </div>
+
+</div>
