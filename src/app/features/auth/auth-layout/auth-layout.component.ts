@@ -2,12 +2,9 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-auth-layout',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './auth-layout.html' // Points straight to your auth-layout.html file
 })
-export class AppComponent {
-  title = 'ujiyar-frontend';
-}
+export class AuthLayoutComponent {}
