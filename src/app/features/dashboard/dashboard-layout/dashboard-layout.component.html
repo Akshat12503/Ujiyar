@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-slate-100 flex flex-col">
   
-  <header class="w-full bg-slate-900 text-white shadow-md border-b border-slate-800 shrink-0 select-none">
+  <header class="w-full bg-slate-900 text-white shadow-md border-b border-slate-800 shrink-0 select-none z-50">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       
       <div class="flex items-center space-x-2">
@@ -28,20 +28,51 @@
         </a>
       </nav>
 
-      <div class="flex items-center space-x-4">
-        <a routerLink="/auth/login" class="text-xs font-semibold text-slate-400 hover:text-slate-200 hidden md:inline-block transition">
-          Sign Out
-        </a>
-        <div class="h-8 w-8 rounded-full bg-wellness-primary/20 flex items-center justify-center text-wellness-dark font-bold text-sm">
+      <div class="relative">
+        <button 
+          (click)="toggleProfileMenu()"
+          type="button"
+          class="h-9 w-9 rounded-full bg-emerald-400 text-slate-950 font-bold text-sm cursor-pointer hover:ring-2 hover:ring-emerald-300 transition focus:outline-none select-none shadow-sm flex items-center justify-center">
           U
+        </button>
+
+        <div 
+          *ngIf="isProfileMenuOpen"
+          class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200/80 text-slate-700 py-2 animate-fade-in z-50">
+          
+          <div class="px-4 py-2 border-b border-slate-100 mb-1">
+            <p class="text-xs font-bold text-slate-800">Active Session</p>
+            <p class="text-[11px] text-slate-400 font-medium truncate">user&#64;ujiyar-workspace.org</p>
+          </div>
+
+          <a routerLink="/dashboard" (click)="closeProfileMenu()" class="flex items-center space-x-3 px-4 py-2 text-xs hover:bg-slate-50 font-medium transition text-slate-600 hover:text-slate-900">
+            <span>👤</span> <span>My Profile Space</span>
+          </a>
+
+          <a routerLink="/dashboard" (click)="closeProfileMenu()" class="flex items-center space-x-3 px-4 py-2 text-xs hover:bg-slate-50 font-medium transition text-slate-600 hover:text-slate-900">
+            <span>⚙️</span> <span>Account Settings</span>
+          </a>
+
+          <a routerLink="/dashboard" (click)="closeProfileMenu()" class="flex items-center space-x-3 px-4 py-2 text-xs hover:bg-slate-50 font-medium transition text-slate-600 hover:text-slate-900">
+            <span>🛡️</span> <span>Privacy & Security</span>
+          </a>
+
+          <div class="border-t border-slate-100 mt-2 pt-1">
+            <a routerLink="/auth/login" (click)="closeProfileMenu()" class="flex items-center space-x-3 px-4 py-2.5 text-xs hover:bg-rose-50 font-semibold text-rose-600 rounded-b-xl transition">
+              <span>🚪</span> <span>Sign Out</span>
+            </a>
+          </div>
+
         </div>
       </div>
 
     </div>
   </header>
 
-  <main class="flex-1 overflow-y-auto">
-    <div class="max-w-7xl mx-auto p-6 md:p-8 animate-fade-in">
+  <div *ngIf="isProfileMenuOpen" (click)="closeProfileMenu()" class="fixed inset-0 z-40 bg-transparent"></div>
+
+  <main class="flex-1 overflow-y-auto z-10">
+    <div class="max-w-7xl mx-auto p-6 md:p-8">
       <router-outlet></router-outlet>
     </div>
   </main>
