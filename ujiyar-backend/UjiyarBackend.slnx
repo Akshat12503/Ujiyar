@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/UjiyarBackend.Application/UjiyarBackend.Application.csproj" />
+    <Project Path="src/UjiyarBackend.Domain/UjiyarBackend.Domain.csproj" />
+    <Project Path="src/UjiyarBackend.Infrastructure/UjiyarBackend.Infrastructure.csproj" />
+    <Project Path="src/UjiyarBackend.WebApi/UjiyarBackend.WebApi.csproj" />
+  </Folder>
+</Solution>
