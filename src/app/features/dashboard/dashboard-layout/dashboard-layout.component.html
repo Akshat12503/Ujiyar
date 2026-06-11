@@ -6,14 +6,19 @@
       <p class="text-xs text-slate-400 mt-0.5">Wellness Workspace</p>
     </div>
     
-    <nav class="flex-1 p-4 space-y-2">
+<!-- Inside your <nav class="flex-1 p-4 space-y-2"> navigation link wrapper -->
+<nav class="flex-1 p-4 space-y-2">
   <a routerLink="/dashboard" routerLinkActive="bg-wellness-primary/20 text-wellness-primary" [routerLinkActiveOptions]="{exact: true}" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-slate-800 transition text-sm font-medium">
     <span>🏠 Dashboard Overview</span>
   </a>
 
-  <!-- Live App Link Navigation Tab Target to Community Shared Spaces -->
   <a routerLink="/dashboard/community" routerLinkActive="bg-wellness-primary/20 text-wellness-primary" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 transition text-sm font-medium">
     <span>👥 Community Spaces</span>
+  </a>
+
+  <!-- Step 9 Core Addition: Professional Care Finder Link Target -->
+  <a routerLink="/dashboard/therapist-finder" routerLinkActive="bg-wellness-primary/20 text-wellness-primary" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 transition text-sm font-medium">
+    <span>🩺 Professional Support</span>
   </a>
   
   <a routerLink="/dashboard/ai-companion" routerLinkActive="bg-wellness-primary/20 text-wellness-primary" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 transition text-sm font-medium">
