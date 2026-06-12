@@ -1,0 +1,41 @@
+# ==========================================
+# UJIYAR MASTER MONOREPO GITIGNORE RULES
+# ==========================================
+
+# --- Core Monorepo Rule Extensions ---
+**/node_modules/
+**/bin/
+**/obj/
+**/.angular/
+**/.vscode/
+**/dist/
+**/tmp/
+**/out-tsc/
+
+# --- .NET Specific Artifacts ---
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+**/App_Data/*.mdf
+**/App_Data/*.ldf
+
+# --- Node & Frontend Package Debug Logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- IDEs, Editors & Cache Spaces ---
+.idea/
+.project
+.classpath
+*.sublime-workspace
+.history/
+.sass-cache/
+**/coverage/
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
