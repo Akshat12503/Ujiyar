@@ -1,0 +1,9 @@
+/* Import the core Tailwind engine */
+@import "tailwindcss";
+
+/* Tailwind v4 CSS-First Configuration Engine */
+@theme {
+  --color-wellness-light: #f0fdf4;
+  --color-wellness-primary: #16a34a;
+  --color-wellness-dark: #14532d;
+}
