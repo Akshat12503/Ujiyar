@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -18,6 +18,10 @@ interface Message {
 export class AiCompanionComponent {
   newMessageText: string = '';
   isAiTyping: boolean = false;
+  
+  // Voice tracking states
+  isRecording: boolean = false;
+  private recognition: any;
 
   // Predefined conversation starter chips to improve UX discovery
   starterPrompts: string[] = [
@@ -36,7 +40,69 @@ export class AiCompanionComponent {
     }
   ];
 
+  constructor(private zone: NgZone) {
+    this.initSpeechRecognition();
+  }
+
+  // Initializes the native browser Web Speech API
+  initSpeechRecognition() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = true; // Allows text to appear while speaking
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onresult = (event: any) => {
+        let transcript = '';
+        // Loop through the active speech results and compile the sentence
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        
+        // Push the transcription back into the Angular lifecycle to update the UI
+        this.zone.run(() => {
+          this.newMessageText = transcript;
+        });
+      };
+
+      this.recognition.onerror = (event: any) => {
+        console.error("Microphone error:", event.error);
+        this.zone.run(() => this.isRecording = false);
+      };
+
+      this.recognition.onend = () => {
+        this.zone.run(() => this.isRecording = false);
+      };
+    } else {
+      console.warn("Speech Recognition API is not supported in this browser.");
+    }
+  }
+
+  // Toggles the microphone listener on and off
+  toggleVoiceRecognition() {
+    if (!this.recognition) {
+      alert("Your browser does not support voice recognition. Please try Chrome or Edge.");
+      return;
+    }
+
+    if (this.isRecording) {
+      this.recognition.stop();
+      this.isRecording = false;
+    } else {
+      this.newMessageText = ''; // Clear input before dictating
+      this.recognition.start();
+      this.isRecording = true;
+    }
+  }
+
   sendMessage(textToSend?: string) {
+    // If the user clicks send while the mic is hot, turn it off automatically
+    if (this.isRecording) {
+      this.toggleVoiceRecognition();
+    }
+
     const messageContent = textToSend || this.newMessageText.trim();
     if (!messageContent) return;
 

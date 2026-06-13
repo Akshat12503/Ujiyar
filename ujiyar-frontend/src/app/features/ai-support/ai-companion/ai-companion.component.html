@@ -57,17 +57,36 @@
     </div>
 
     <form (ngSubmit)="sendMessage()" class="flex items-center gap-3">
-      <input 
-        type="text"
-        [(ngModel)]="newMessageText"
-        name="chatMessage"
-        placeholder="Share what is on your mind safely..."
-        autocomplete="off"
-        class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-wellness-primary/20 focus:border-wellness-primary text-slate-700 text-sm transition">
+      
+      <div class="relative flex-1">
+        <input 
+          type="text"
+          [(ngModel)]="newMessageText"
+          name="chatMessage"
+          placeholder="Share what is on your mind safely..."
+          autocomplete="off"
+          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-wellness-primary/20 focus:border-wellness-primary text-slate-700 text-sm transition pr-12">
+        
+        <button 
+          type="button"
+          (click)="toggleVoiceRecognition()"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-200 focus:outline-none"
+          [class.text-red-500]="isRecording"
+          [class.bg-red-50]="isRecording"
+          [class.animate-pulse]="isRecording"
+          [class.text-slate-400]="!isRecording"
+          [class.hover:bg-slate-200]="!isRecording"
+          [class.hover:text-slate-700]="!isRecording"
+          title="Toggle voice dictation">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+          </svg>
+        </button>
+      </div>
       
       <button 
         type="submit"
-        [disabled]="!newMessageText.trim() && !isAiTyping"
+        [disabled]="(!newMessageText.trim() && !isRecording) || isAiTyping"
         class="bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-white font-medium p-3 rounded-xl transition shadow-sm shrink-0 flex items-center justify-center">
         <span>🚀</span>
       </button>
