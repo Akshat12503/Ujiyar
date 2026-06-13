@@ -6,6 +6,17 @@ using UjiyarBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- NEW CORS CONFIGURATION ---
+// This tells the backend to trust requests coming from your Angular app
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient",
+        b => b.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+// ------------------------------
+
 // 1. Add PostgreSQL Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -14,7 +25,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IMoodLogRepository, MoodLogRepository>();
 
 // 3. Register MediatR (Application Layer)
-// We just need to point it to one of our Handlers so it scans the whole Application assembly
 builder.Services.AddMediatR(cfg => 
     cfg.RegisterServicesFromAssemblyContaining<CreateMoodLogCommandHandler>());
 
@@ -31,6 +41,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// --- NEW CORS MIDDLEWARE ---
+// MUST be placed before UseAuthorization and MapControllers!
+app.UseCors("AllowAngularDevClient");
+// ---------------------------
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
