@@ -18,11 +18,14 @@ public class MoodLogsController : ControllerBase
 
     // POST: api/moodlogs
     // Called when the Angular app wants to save a new reflection
+    // POST: api/moodlogs
     [HttpPost]
     public async Task<IActionResult> CreateLog([FromBody] CreateMoodLogCommand command)
     {
-        var moodLogId = await _sender.Send(command);
-        return Ok(new { Id = moodLogId, Message = "Mood log saved successfully." });
+        // result now contains both { Id, AiMessage }
+        var result = await _sender.Send(command); 
+        
+        return Ok(result); // Send the entire package back to Angular
     }
 
     // GET: api/moodlogs/user123?days=7

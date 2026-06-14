@@ -5,33 +5,38 @@ using MediatR;
 using UjiyarBackend.Domain.Entities;
 using UjiyarBackend.Domain.Enums;
 using UjiyarBackend.Domain.Repositories;
+using UjiyarBackend.Application.Services; // <-- Importing the AI Service
 
 namespace UjiyarBackend.Application.MoodLogs.Commands;
 
-// 1. Define the input parameter request signature payload data contract
-public record CreateMoodLogCommand(int MoodValue, string JournalNote, string UserId) : IRequest<Guid>;
+// 1. The new payload we send BACK to Angular
+public record CreateMoodLogResponse(Guid Id, string AiMessage);
 
-// 2. Implement the independent use case processor logic execution handler
-public class CreateMoodLogCommandHandler : IRequestHandler<CreateMoodLogCommand, Guid>
+// 2. Update the Command to expect our new Response object
+public record CreateMoodLogCommand(int MoodValue, string JournalNote, string UserId) : IRequest<CreateMoodLogResponse>;
+
+public class CreateMoodLogCommandHandler : IRequestHandler<CreateMoodLogCommand, CreateMoodLogResponse>
 {
     private readonly IMoodLogRepository _repository;
+    private readonly IGeminiCoachService _aiService; // <-- The Brain
 
-    public CreateMoodLogCommandHandler(IMoodLogRepository repository)
+    public CreateMoodLogCommandHandler(IMoodLogRepository repository, IGeminiCoachService aiService)
     {
         _repository = repository;
+        _aiService = aiService;
     }
 
-    public async Task<Guid> Handle(CreateMoodLogCommand request, CancellationToken cancellationToken)
+    public async Task<CreateMoodLogResponse> Handle(CreateMoodLogCommand request, CancellationToken cancellationToken)
     {
-        // Explicit data transformation validation safety rule casting
+        // 1. Save to PostgreSQL
         var scaleValue = (MoodScale)request.MoodValue;
-
-        // Instantiate our domain entity object using the secure parameter constructor
         var moodLog = new MoodLog(scaleValue, request.JournalNote, request.UserId);
-
-        // Execute persistence save calls abstracted behind our domain contract
         await _repository.AddAsync(moodLog);
 
-        return moodLog.Id;
+        // 2. Fetch the dynamic empathy response from Gemini API!
+        var aiMessage = await _aiService.GenerateCoachingResponseAsync(request.MoodValue, request.JournalNote);
+
+        // 3. Package both the DB Id and the AI's words together
+        return new CreateMoodLogResponse(moodLog.Id, aiMessage);
     }
 }

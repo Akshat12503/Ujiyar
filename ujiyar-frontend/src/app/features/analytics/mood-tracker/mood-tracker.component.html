@@ -44,6 +44,14 @@
           {{ isSaving ? 'Saving...' : 'Log Entry Check-in' }}
         </button>
       </div>
+
+      <div *ngIf="aiCoachResponse" class="mt-6 p-5 bg-indigo-50 border border-indigo-100 rounded-xl animate-fade-in">
+        <div class="flex items-center space-x-2 mb-2">
+          <span class="text-lg">🤖</span>
+          <h4 class="text-sm font-bold text-indigo-900">AI Coach Perspective</h4>
+        </div>
+        <p class="text-sm text-indigo-700 leading-relaxed">{{ aiCoachResponse }}</p>
+      </div>
     </div>
   </div>
 
@@ -62,15 +70,11 @@
           <span class="text-lg">{{ entry.mood.emoji }}</span>
           <span class="text-xs font-bold text-slate-700">{{ entry.mood.label }}</span>
         </div>
-        <span class="text-[10px] font-medium text-slate-400">{{ entry.date | date:'shortTime' }}</span>
+        <span class="text-xs font-medium text-slate-400">{{ entry.date | date:'shortTime' }}</span>
       </div>
       <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed break-words" *ngIf="entry.note">
         {{ entry.note }}
       </p>
-      <div class="text-[10px] text-slate-400 italic flex items-center space-x-1" *ngIf="entry.private">
-        <span>🔒 Shared only locally</span>
-      </div>
     </div>
   </div>
-
 </div>

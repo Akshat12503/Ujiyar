@@ -29,6 +29,7 @@ export class MoodTrackerComponent implements OnInit {
   journalText: string = '';
   isAnonymous: boolean = false;
   isSaving: boolean = false;
+  aiCoachResponse: string = ''; // New field for AI feedback
   
   loggedEntries: any[] = [];
 
@@ -62,9 +63,13 @@ export class MoodTrackerComponent implements OnInit {
   saveReflection() {
     if (!this.selectedMood) return;
     this.isSaving = true;
+    this.aiCoachResponse = ''; // Reset UI for new AI response
 
     this.moodLogService.saveReflection('user-123', this.selectedMood.value, this.journalText).subscribe({
-      next: () => {
+      next: (response: any) => {
+        // Capture AI message from backend response object { id, aiMessage }
+        this.aiCoachResponse = response.aiMessage;
+        
         this.loadRecentEntries();
         this.selectedMood = null;
         this.journalText = '';

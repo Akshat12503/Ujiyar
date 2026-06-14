@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { MoodLogService } from '../../../services/mood-log.service';
-import { Subscription } from 'rxjs'; // <-- Import Subscription
+import { Subscription } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -20,47 +20,27 @@ interface MoodLog {
   imports: [CommonModule],
   templateUrl: './analytics-dashboard.component.html'
 })
-export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
-  @ViewChild('trendChart') trendChartCanvas!: ElementRef<HTMLCanvasElement>;
+export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('trendChart', { static: false }) trendChartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
   activeFilter: '3d' | '7d' | '14d' | '1m' = '7d';
-  
   isLoading: boolean = false;
   logs: MoodLog[] = []; 
-  
-  // Create a variable to hold our radio connection
   private refreshSub!: Subscription; 
 
   constructor(private moodLogService: MoodLogService) {}
 
   ngOnInit() {
-    // 1. Load data normally on page load
     this.fetchDataForTimeframe(this.activeFilter);
 
-    // 2. Tune into the Radio Station! Whenever a signal is broadcast, reload the data.
     this.refreshSub = this.moodLogService.refreshNeeded$.subscribe(() => {
       this.fetchDataForTimeframe(this.activeFilter);
     });
   }
 
-  get totalReflections(): number {
-    return this.logs.length;
-  }
-
-  get averageMood(): number {
-    if (this.logs.length === 0) return 0;
-    const sum = this.logs.reduce((acc, log) => acc + log.value, 0);
-    return parseFloat((sum / this.logs.length).toFixed(1));
-  }
-
-  getMoodLabel(value: number): string {
-    const labels: Record<number, string> = { 1: 'Overwhelmed 😔', 2: 'Anxious 😟', 3: 'Neutral 😐', 4: 'Good 🙂', 5: 'Excellent 😄' };
-    return labels[value] || 'Unknown';
-  }
-
-  loadDashboardData() {
-    this.fetchDataForTimeframe(this.activeFilter);
+  ngAfterViewInit() {
+    this.renderEmptyChartInstance();
   }
 
   private getDaysFromFilter(filter: string): number {
@@ -73,9 +53,18 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  get totalReflections(): number {
+    return this.logs.length;
+  }
+
+  get averageMood(): number {
+    if (this.logs.length === 0) return 0;
+    const sum = this.logs.reduce((acc, log) => acc + log.value, 0);
+    return parseFloat((sum / this.logs.length).toFixed(1));
+  }
+
   fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
-    if (this.logs.length === 0) this.isLoading = true;
-    
+    this.isLoading = true;
     const daysToFetch = this.getDaysFromFilter(filter);
 
     this.moodLogService.getRecentLogs('user-123', daysToFetch).subscribe({
@@ -89,49 +78,37 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
         })).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         
         this.isLoading = false;
-
-        setTimeout(() => {
-          if (!this.chartInstance) {
-            this.renderEmptyChartInstance();
-          }
-          this.updateChartData();
-        }, 0);
+        this.updateChartData();
       },
       error: (err: any) => {
-        console.error('Error fetching real chart data:', err);
+        console.error('Error fetching chart data:', err);
         this.isLoading = false;
       }
     });
   }
 
   updateChartData() {
+    // Only attempt to update if the chart is ready
     if (!this.chartInstance) return;
 
-    const newLabels = this.logs.map(log => {
-      const date = new Date(log.createdAt);
-      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    });
-    
-    const newDataPoints = this.logs.map(log => log.value);
-
-    this.chartInstance.data.labels = newLabels;
-    this.chartInstance.data.datasets[0].data = newDataPoints;
-    
+    this.chartInstance.data.labels = this.logs.map(log => 
+      new Date(log.createdAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    );
+    this.chartInstance.data.datasets[0].data = this.logs.map(log => log.value);
     this.chartInstance.update();
   }
 
   renderEmptyChartInstance() {
-    if (!this.trendChartCanvas) return;
+    if (!this.trendChartCanvas?.nativeElement) return;
+    
     const ctx = this.trendChartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: [], 
-        datasets: [{
+      data: { labels: [], datasets: [{
           label: 'Mental Baseline Balance',
-          data: [], 
+          data: [],
           borderColor: '#16a34a',
           backgroundColor: 'rgba(22, 163, 74, 0.05)',
           borderWidth: 3,
@@ -139,24 +116,15 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
           fill: true,
           pointBackgroundColor: '#16a34a',
           pointRadius: 4
-        }]
-      },
+      }] },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: {
-            min: 1, max: 5,
-            ticks: {
-              stepSize: 1,
-              callback: function(value) {
-                const labels: Record<number, string> = { 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' };
-                return labels[Number(value)] || value;
-              }
-            },
-            grid: { color: '#f1f5f9' }
-          },
+          y: { min: 1, max: 5, ticks: { stepSize: 1, callback: (value) => 
+            ({ 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' }[Number(value)] || value) 
+          }, grid: { color: '#f1f5f9' } },
           x: { grid: { display: false } }
         }
       }
@@ -170,12 +138,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-    }
-    // 3. Always turn off the radio when leaving the room to prevent memory leaks!
-    if (this.refreshSub) {
-      this.refreshSub.unsubscribe();
-    }
+    this.chartInstance?.destroy();
+    this.refreshSub?.unsubscribe();
   }
 }

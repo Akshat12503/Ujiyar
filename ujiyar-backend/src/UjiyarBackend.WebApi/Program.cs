@@ -29,6 +29,8 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<CreateMoodLogCommandHandler>());
 
 // 4. Standard API services
+// Register the HTTP Client and our AI Service
+builder.Services.AddHttpClient<UjiyarBackend.Application.Services.IGeminiCoachService, UjiyarBackend.Application.Services.GeminiCoachService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
