@@ -1,64 +1,129 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
+import { MoodLogService } from '../../../services/mood-log.service';
 
 Chart.register(...registerables);
 
-// Definition matrix matching configuration options to chart data states
-interface TimeframeConfig {
-  labels: string[];
-  data: number[];
+interface MoodLog {
+  id: string;
+  value: number;
+  journalNote: string;
+  createdAt: string;
+  userId: string;
 }
 
 @Component({
   selector: 'app-analytics-dashboard',
   standalone: true,
-  imports: [CommonModule], // Added for structural directive rendering template bindings
+  imports: [CommonModule],
   templateUrl: './analytics-dashboard.component.html'
 })
-export class AnalyticsDashboardComponent implements AfterViewInit, OnDestroy {
+export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   @ViewChild('trendChart') trendChartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
-  activeFilter: '3d' | '7d' | '14d' | '1m' = '7d'; // Default initial configuration flag
+  activeFilter: '3d' | '7d' | '14d' | '1m' = '7d';
+  
+  isLoading: boolean = false;
+  logs: MoodLog[] = []; 
 
-  // Mock data registry representing granular backfilled historical logs
-  timeframeData: Record<'3d' | '7d' | '14d' | '1m', TimeframeConfig> = {
-    '3d': {
-      labels: ['Fri', 'Sat', 'Sun'],
-      data: [4, 3, 5]
-    },
-    '7d': {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      data: [3, 4, 2, 5, 4, 3, 5]
-    },
-    '14d': {
-      labels: ['W1 Mon', 'Wed', 'Fri', 'W2 Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      data: [4, 5, 3, 4, 3, 4, 2, 5, 4, 5]
-    },
-    '1m': {
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-      data: [3.2, 4.1, 3.5, 4.6]
-    }
-  };
+  constructor(private moodLogService: MoodLogService) {}
 
-  ngAfterViewInit() {
-    this.renderChartInstance();
+  ngOnInit() {
+    this.fetchDataForTimeframe(this.activeFilter);
   }
 
-  renderChartInstance() {
+  get totalReflections(): number {
+    return this.logs.length;
+  }
+
+  get averageMood(): number {
+    if (this.logs.length === 0) return 0;
+    const sum = this.logs.reduce((acc, log) => acc + log.value, 0);
+    return parseFloat((sum / this.logs.length).toFixed(1));
+  }
+
+  getMoodLabel(value: number): string {
+    const labels: Record<number, string> = { 1: 'Overwhelmed 😔', 2: 'Anxious 😟', 3: 'Neutral 😐', 4: 'Good 🙂', 5: 'Excellent 😄' };
+    return labels[value] || 'Unknown';
+  }
+
+  loadDashboardData() {
+    this.fetchDataForTimeframe(this.activeFilter);
+  }
+
+  private getDaysFromFilter(filter: string): number {
+    switch (filter) {
+      case '3d': return 3;
+      case '7d': return 7;
+      case '14d': return 14;
+      case '1m': return 30;
+      default: return 7;
+    }
+  }
+
+  fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
+    if (this.logs.length === 0) this.isLoading = true;
+    
+    const daysToFetch = this.getDaysFromFilter(filter);
+
+    this.moodLogService.getRecentLogs('user-123', daysToFetch).subscribe({
+      next: (rawData: any[]) => {
+        this.logs = rawData.map(item => ({
+          id: item.id || item.Id,
+          value: Number(item.value || item.Value || 3), 
+          journalNote: item.journalNote || item.JournalNote || '',
+          createdAt: item.createdAt || item.CreatedAt,
+          userId: item.userId || item.UserId
+        })).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        
+        this.isLoading = false;
+
+        // THE FIX: Wait 1 tick for Angular to put the <canvas> back into the HTML
+        setTimeout(() => {
+          if (!this.chartInstance) {
+            this.renderEmptyChartInstance();
+          }
+          this.updateChartData();
+        }, 0);
+      },
+      error: (err: any) => {
+        console.error('Error fetching real chart data:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  updateChartData() {
+    if (!this.chartInstance) return;
+
+    const newLabels = this.logs.map(log => {
+      const date = new Date(log.createdAt);
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    });
+    
+    const newDataPoints = this.logs.map(log => log.value);
+
+    this.chartInstance.data.labels = newLabels;
+    this.chartInstance.data.datasets[0].data = newDataPoints;
+    
+    this.chartInstance.update();
+  }
+
+  renderEmptyChartInstance() {
+    if (!this.trendChartCanvas) return;
+
     const ctx = this.trendChartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
-
-    const currentConfig = this.timeframeData[this.activeFilter];
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: currentConfig.labels,
+        labels: [], 
         datasets: [{
           label: 'Mental Baseline Balance',
-          data: currentConfig.data,
+          data: [], 
           borderColor: '#16a34a',
           backgroundColor: 'rgba(22, 163, 74, 0.05)',
           borderWidth: 3,
@@ -91,19 +156,10 @@ export class AnalyticsDashboardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // Active trigger to mutate chart presentation configs at runtime smoothly
   changeTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
+    if (this.activeFilter === filter) return; 
     this.activeFilter = filter;
-    if (!this.chartInstance) return;
-
-    const targetConfig = this.timeframeData[filter];
-    
-    // Direct modification of ChartJS memory instance properties
-    this.chartInstance.data.labels = targetConfig.labels;
-    this.chartInstance.data.datasets[0].data = targetConfig.data;
-    
-    // Call native update animation engine run
-    this.chartInstance.update();
+    this.fetchDataForTimeframe(filter); 
   }
 
   ngOnDestroy() {

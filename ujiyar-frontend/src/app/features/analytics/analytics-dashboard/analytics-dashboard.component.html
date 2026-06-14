@@ -1,39 +1,77 @@
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 space-y-4">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="p-6 max-w-6xl mx-auto space-y-6 bg-slate-50/50 min-h-screen">
+  
+  <div class="flex items-center justify-between">
     <div>
-      <h3 class="text-base font-bold text-slate-800">Weekly Emotional Well-being Trend</h3>
-      <p class="text-xs text-slate-400">Aggregated reflection insights generated over your selected tracking window.</p>
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Mind Space Overview</h1>
+      <p class="text-xs text-slate-500">Real-time reflection patterns from PostgreSQL</p>
     </div>
-    
-    <div class="flex items-center bg-slate-100 p-1 rounded-xl self-start sm:self-center border border-slate-200/40">
-      <button 
-        (click)="changeTimeframe('3d')"
-        [class]="activeFilter === '3d' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 font-medium'"
-        class="px-3 py-1.5 text-xs rounded-lg transition-all duration-200 select-none">
-        3 Days
-      </button>
-      <button 
-        (click)="changeTimeframe('7d')"
-        [class]="activeFilter === '7d' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 font-medium'"
-        class="px-3 py-1.5 text-xs rounded-lg transition-all duration-200 select-none">
-        7 Days
-      </button>
-      <button 
-        (click)="changeTimeframe('14d')"
-        [class]="activeFilter === '14d' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 font-medium'"
-        class="px-3 py-1.5 text-xs rounded-lg transition-all duration-200 select-none">
-        14 Days
-      </button>
-      <button 
-        (click)="changeTimeframe('1m')"
-        [class]="activeFilter === '1m' ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 font-medium'"
-        class="px-3 py-1.5 text-xs rounded-lg transition-all duration-200 select-none">
-        1 Month
-      </button>
-    </div>
+    <button (click)="loadDashboardData()" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-medium hover:bg-slate-50 transition shadow-xs flex items-center gap-1.5">
+      🔄 Refresh Data
+    </button>
   </div>
 
-  <div class="relative w-full h-64 sm:h-72">
-    <canvas #trendChart></canvas>
+  <div *ngIf="isLoading" class="p-12 text-center text-sm text-slate-400 font-medium animate-pulse">
+    Assembling data pipeline metrics...
+  </div>
+
+  <div *ngIf="!isLoading" class="space-y-6">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-xs flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">Total Journal Entries</p>
+          <h3 class="text-3xl font-black text-slate-800 mt-1">{{ totalReflections }}</h3>
+        </div>
+        <div class="h-12 w-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">📝</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-xs flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">Average Mind Rating</p>
+          <h3 class="text-3xl font-black text-slate-800 mt-1">{{ averageMood }} <span class="text-lg font-medium text-slate-400">/ 5</span></h3>
+        </div>
+        <div class="h-12 w-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">🧠</div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-xs">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase">Mental Baseline Trend</h3>
+        
+        <div class="flex bg-slate-100 p-1 rounded-lg">
+          <button (click)="changeTimeframe('3d')" [class.bg-white]="activeFilter === '3d'" [class.shadow-sm]="activeFilter === '3d'" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 transition-all">3D</button>
+          <button (click)="changeTimeframe('7d')" [class.bg-white]="activeFilter === '7d'" [class.shadow-sm]="activeFilter === '7d'" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 transition-all">7D</button>
+          <button (click)="changeTimeframe('14d')" [class.bg-white]="activeFilter === '14d'" [class.shadow-sm]="activeFilter === '14d'" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 transition-all">14D</button>
+          <button (click)="changeTimeframe('1m')" [class.bg-white]="activeFilter === '1m'" [class.shadow-sm]="activeFilter === '1m'" class="px-3 py-1 text-xs font-medium rounded-md text-slate-600 transition-all">1M</button>
+        </div>
+      </div>
+      
+      <div class="h-64 w-full relative">
+        <canvas #trendChart></canvas>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-xs space-y-4">
+      <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase">Historical Timeline Ledger</h3>
+      
+      <div *ngIf="logs.length === 0" class="p-6 text-center text-xs text-slate-400 italic">
+        No logs found for this timeframe.
+      </div>
+
+      <div *ngIf="logs.length > 0" class="divide-y divide-slate-100 max-h-96 overflow-y-auto pr-2">
+        <div *ngFor="let log of logs.slice().reverse()" class="py-4 first:pt-0 last:pb-0 flex items-start gap-4 transition hover:bg-slate-50/50 px-2 rounded-xl">
+          <div class="shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200/40 shadow-2xs">
+            {{ getMoodLabel(log.value) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-slate-700 leading-relaxed break-words font-medium">{{ log.journalNote }}</p>
+            <div class="flex items-center gap-2 mt-1 text-[10px] text-slate-400 font-semibold">
+              <span>{{ log.createdAt | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

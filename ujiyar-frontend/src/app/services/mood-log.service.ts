@@ -21,4 +21,7 @@ export class MoodLogService {
     
     return this.http.post(this.apiUrl, payload);
   }
+  getRecentLogs(userId: string, days: number = 7): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${userId}?days=${days}`);
+  }
 }
