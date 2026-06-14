@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { MoodLogService } from '../../../services/mood-log.service';
+import { Subscription } from 'rxjs'; // <-- Import Subscription
 
 Chart.register(...registerables);
 
@@ -27,11 +28,20 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   
   isLoading: boolean = false;
   logs: MoodLog[] = []; 
+  
+  // Create a variable to hold our radio connection
+  private refreshSub!: Subscription; 
 
   constructor(private moodLogService: MoodLogService) {}
 
   ngOnInit() {
+    // 1. Load data normally on page load
     this.fetchDataForTimeframe(this.activeFilter);
+
+    // 2. Tune into the Radio Station! Whenever a signal is broadcast, reload the data.
+    this.refreshSub = this.moodLogService.refreshNeeded$.subscribe(() => {
+      this.fetchDataForTimeframe(this.activeFilter);
+    });
   }
 
   get totalReflections(): number {
@@ -80,7 +90,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
         
         this.isLoading = false;
 
-        // THE FIX: Wait 1 tick for Angular to put the <canvas> back into the HTML
         setTimeout(() => {
           if (!this.chartInstance) {
             this.renderEmptyChartInstance();
@@ -113,7 +122,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
 
   renderEmptyChartInstance() {
     if (!this.trendChartCanvas) return;
-
     const ctx = this.trendChartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
@@ -139,8 +147,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
         plugins: { legend: { display: false } },
         scales: {
           y: {
-            min: 1,
-            max: 5,
+            min: 1, max: 5,
             ticks: {
               stepSize: 1,
               callback: function(value) {
@@ -165,6 +172,10 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.chartInstance) {
       this.chartInstance.destroy();
+    }
+    // 3. Always turn off the radio when leaving the room to prevent memory leaks!
+    if (this.refreshSub) {
+      this.refreshSub.unsubscribe();
     }
   }
 }

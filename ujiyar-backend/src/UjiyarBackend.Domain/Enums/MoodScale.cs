@@ -2,9 +2,9 @@ namespace UjiyarBackend.Domain.Enums;
 
 public enum MoodScale
 {
-    Stormy = 1,   // ⛈️
-    Rainy = 2,    // 🌧️
-    Cloudy = 3,   // ☁️
-    Growing = 4,  // 🌱
-    Sunny = 5     // ☀️
+    Overwhelmed = 1,
+    Anxious = 2,
+    Tired = 3,   // Or Neutral, whichever you prefer!
+    Calm = 4,
+    Radiant = 5
 }

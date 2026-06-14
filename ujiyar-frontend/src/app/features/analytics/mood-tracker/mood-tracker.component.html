@@ -39,9 +39,9 @@
 
         <button 
           (click)="saveReflection()"
-          [disabled]="!selectedMood"
+          [disabled]="!selectedMood || isSaving"
           class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white font-medium rounded-xl text-xs transition shadow-sm">
-          Log Entry Check-in
+          {{ isSaving ? 'Saving...' : 'Log Entry Check-in' }}
         </button>
       </div>
     </div>
