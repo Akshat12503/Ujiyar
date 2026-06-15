@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { MoodLogService } from '../../../services/mood-log.service';
@@ -20,7 +20,7 @@ interface MoodLog {
   imports: [CommonModule],
   templateUrl: './analytics-dashboard.component.html'
 })
-export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   @ViewChild('trendChart', { static: false }) trendChartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
@@ -37,10 +37,6 @@ export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.refreshSub = this.moodLogService.refreshNeeded$.subscribe(() => {
       this.fetchDataForTimeframe(this.activeFilter);
     });
-  }
-
-  ngAfterViewInit() {
-    this.renderEmptyChartInstance();
   }
 
   private getDaysFromFilter(filter: string): number {
@@ -63,12 +59,28 @@ export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDes
     return parseFloat((sum / this.logs.length).toFixed(1));
   }
 
-  fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
+  getMoodLabel(value: number): string {
+    const labels: Record<number, string> = { 
+      1: 'Overwhelmed ⛈️', 
+      2: 'Anxious 🌧️', 
+      3: 'Tired ☁️', 
+      4: 'Calm 🌱', 
+      5: 'Radiant ☀️' 
+    };
+    return labels[value] || 'Unknown';
+  }
+
+  loadDashboardData() {
+    this.fetchDataForTimeframe(this.activeFilter);
+  }
+
+fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
     this.isLoading = true;
     const daysToFetch = this.getDaysFromFilter(filter);
 
     this.moodLogService.getRecentLogs('user-123', daysToFetch).subscribe({
       next: (rawData: any[]) => {
+        console.log(`Fetched data for ${filter}: ${rawData.length} entries found.`);
         this.logs = rawData.map(item => ({
           id: item.id || item.Id,
           value: Number(item.value || item.Value || 3), 
@@ -78,7 +90,18 @@ export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDes
         })).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         
         this.isLoading = false;
-        this.updateChartData();
+        
+        setTimeout(() => {
+          // THE FIX: If an old chart exists, destroy it because its canvas was deleted by *ngIf
+          if (this.chartInstance) {
+            this.chartInstance.destroy();
+            this.chartInstance = null;
+          }
+          
+          // Rebuild the chart on the newly rendered canvas and push the data
+          this.renderEmptyChartInstance();
+          this.updateChartData();
+        }, 50);
       },
       error: (err: any) => {
         console.error('Error fetching chart data:', err);
@@ -88,7 +111,6 @@ export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   updateChartData() {
-    // Only attempt to update if the chart is ready
     if (!this.chartInstance) return;
 
     this.chartInstance.data.labels = this.logs.map(log => 
