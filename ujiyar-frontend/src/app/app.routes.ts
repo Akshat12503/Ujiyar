@@ -6,7 +6,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { AiCompanionComponent } from './features/ai-support/ai-companion/ai-companion.component';
 import { CommunityHubComponent } from './features/community/community-hub/community-hub.component';
-import { TherapistFinderComponent } from './features/community/therapist-finder/therapist-finder.component'; // Import addition
+import { TherapistFinderComponent } from './features/community/therapist-finder/therapist-finder.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -26,7 +26,7 @@ export const routes: Routes = [
       { path: '', component: DashboardOverviewComponent },
       { path: 'ai-companion', component: AiCompanionComponent },
       { path: 'community', component: CommunityHubComponent },
-      { path: 'therapist-finder', component: TherapistFinderComponent } // Registered directory tracking endpoint node
+      { path: 'therapist-finder', component: TherapistFinderComponent }
     ]
   },
   { path: '**', redirectTo: 'dashboard' }
