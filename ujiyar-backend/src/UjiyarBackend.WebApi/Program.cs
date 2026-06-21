@@ -6,8 +6,12 @@ using UjiyarBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- NEW CORS CONFIGURATION ---
-// This tells the backend to trust requests coming from your Angular app
+// --- ADDED THIS LINE ---
+// Forces the backend to listen on Port 5000 to match Angular
+builder.WebHost.UseUrls("http://localhost:5000");
+// -----------------------
+
+// --- CORS CONFIGURATION ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient",
@@ -29,7 +33,6 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<CreateMoodLogCommandHandler>());
 
 // 4. Standard API services
-// Register the HTTP Client and our AI Service
 builder.Services.AddHttpClient<UjiyarBackend.Application.Services.IGeminiCoachService, UjiyarBackend.Application.Services.GeminiCoachService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -44,8 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// --- NEW CORS MIDDLEWARE ---
-// MUST be placed before UseAuthorization and MapControllers!
+// --- CORS MIDDLEWARE ---
 app.UseCors("AllowAngularDevClient");
 // ---------------------------
 

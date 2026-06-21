@@ -1,3 +1,4 @@
+import { authGuard } from './core/guards/auth-guard';
 import { Routes } from '@angular/router';
 import { AuthLayoutComponent } from './features/auth/auth-layout/auth-layout.component';
 import { DashboardLayoutComponent } from './features/dashboard/dashboard-layout/dashboard-layout.component';
@@ -22,6 +23,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
+    canActivate: [authGuard], // <--- The guard is now protecting this entire section
     children: [
       { path: '', component: DashboardOverviewComponent },
       { path: 'ai-companion', component: AiCompanionComponent },
