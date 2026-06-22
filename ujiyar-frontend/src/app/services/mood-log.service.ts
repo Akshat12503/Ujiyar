@@ -7,7 +7,7 @@ import { tap, map } from 'rxjs/operators'; // <-- Notice we added 'map'
   providedIn: 'root'
 })
 export class MoodLogService {
-  private apiUrl = 'http://localhost:5165/api/MoodLogs';
+  private apiUrl = 'http://localhost:5000/api/MoodLogs';
 
   private _refreshNeeded$ = new Subject<void>();
 

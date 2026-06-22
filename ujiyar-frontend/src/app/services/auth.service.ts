@@ -14,7 +14,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5165/api/auth'; // We will build this C# endpoint next!
+  private apiUrl = 'http://localhost:5000/api/auth'; // We will build this C# endpoint next!
   
   // BehaviorSubject remembers the current user so any component can check who is logged in
   private currentUserSubject = new BehaviorSubject<User | null>(null);

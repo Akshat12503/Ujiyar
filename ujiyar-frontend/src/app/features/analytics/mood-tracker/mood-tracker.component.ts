@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MoodLogService } from '../../../services/mood-log.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface MoodOption {
   emoji: string;
@@ -29,18 +30,24 @@ export class MoodTrackerComponent implements OnInit {
   journalText: string = '';
   isAnonymous: boolean = false;
   isSaving: boolean = false;
-  aiCoachResponse: string = ''; // New field for AI feedback
-  
-  loggedEntries: any[] = [];
+  aiCoachResponse: string = '';
 
-  constructor(private moodLogService: MoodLogService) {}
+  loggedEntries: any[] = [];
+  private currentUserId: string = '';
+
+  constructor(
+    private moodLogService: MoodLogService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    // Get the real logged-in user's ID from AuthService
+    this.currentUserId = this.authService.currentUserValue?.id ?? '';
     this.loadRecentEntries();
   }
 
   loadRecentEntries() {
-    this.moodLogService.getRecentLogs('user-123', 1).subscribe({
+    this.moodLogService.getRecentLogs(this.currentUserId, 1).subscribe({
       next: (data: any[]) => {
         this.loggedEntries = data
           .map(item => ({
@@ -48,7 +55,7 @@ export class MoodTrackerComponent implements OnInit {
             mood: this.moods.find(m => m.value === Number(item.value || item.Value)) || this.moods[2],
             note: item.journalNote || item.JournalNote || '',
             date: new Date(item.createdAt || item.CreatedAt),
-            private: false 
+            private: false
           }))
           .sort((a, b) => b.date.getTime() - a.date.getTime());
       },
@@ -63,13 +70,11 @@ export class MoodTrackerComponent implements OnInit {
   saveReflection() {
     if (!this.selectedMood) return;
     this.isSaving = true;
-    this.aiCoachResponse = ''; // Reset UI for new AI response
+    this.aiCoachResponse = '';
 
-    this.moodLogService.saveReflection('user-123', this.selectedMood.value, this.journalText).subscribe({
+    this.moodLogService.saveReflection(this.currentUserId, this.selectedMood.value, this.journalText).subscribe({
       next: (response: any) => {
-        // Capture AI message from backend response object { id, aiMessage }
         this.aiCoachResponse = response.aiMessage;
-        
         this.loadRecentEntries();
         this.selectedMood = null;
         this.journalText = '';

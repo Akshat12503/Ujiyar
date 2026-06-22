@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
 import { MoodLogService } from '../../../services/mood-log.service';
+import { AuthService } from '../../../services/auth.service';
 import { Subscription } from 'rxjs';
 
 Chart.register(...registerables);
@@ -22,16 +23,23 @@ interface MoodLog {
 })
 export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   @ViewChild('trendChart', { static: false }) trendChartCanvas!: ElementRef<HTMLCanvasElement>;
-  
+
   chartInstance: Chart | null = null;
   activeFilter: '3d' | '7d' | '14d' | '1m' = '7d';
   isLoading: boolean = false;
-  logs: MoodLog[] = []; 
-  private refreshSub!: Subscription; 
+  logs: MoodLog[] = [];
+  private refreshSub!: Subscription;
+  private currentUserId: string = '';
 
-  constructor(private moodLogService: MoodLogService) {}
+  constructor(
+    private moodLogService: MoodLogService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    // Get the real logged-in user's ID from AuthService
+    this.currentUserId = this.authService.currentUserValue?.id ?? '';
+
     this.fetchDataForTimeframe(this.activeFilter);
 
     this.refreshSub = this.moodLogService.refreshNeeded$.subscribe(() => {
@@ -60,12 +68,12 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   getMoodLabel(value: number): string {
-    const labels: Record<number, string> = { 
-      1: 'Overwhelmed ⛈️', 
-      2: 'Anxious 🌧️', 
-      3: 'Tired ☁️', 
-      4: 'Calm 🌱', 
-      5: 'Radiant ☀️' 
+    const labels: Record<number, string> = {
+      1: 'Overwhelmed ⛈️',
+      2: 'Anxious 🌧️',
+      3: 'Tired ☁️',
+      4: 'Calm 🌱',
+      5: 'Radiant ☀️'
     };
     return labels[value] || 'Unknown';
   }
@@ -74,31 +82,28 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
     this.fetchDataForTimeframe(this.activeFilter);
   }
 
-fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
+  fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
     this.isLoading = true;
     const daysToFetch = this.getDaysFromFilter(filter);
 
-    this.moodLogService.getRecentLogs('user-123', daysToFetch).subscribe({
+    this.moodLogService.getRecentLogs(this.currentUserId, daysToFetch).subscribe({
       next: (rawData: any[]) => {
         console.log(`Fetched data for ${filter}: ${rawData.length} entries found.`);
         this.logs = rawData.map(item => ({
           id: item.id || item.Id,
-          value: Number(item.value || item.Value || 3), 
+          value: Number(item.value || item.Value || 3),
           journalNote: item.journalNote || item.JournalNote || '',
           createdAt: item.createdAt || item.CreatedAt,
           userId: item.userId || item.UserId
         })).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        
+
         this.isLoading = false;
-        
+
         setTimeout(() => {
-          // THE FIX: If an old chart exists, destroy it because its canvas was deleted by *ngIf
           if (this.chartInstance) {
             this.chartInstance.destroy();
             this.chartInstance = null;
           }
-          
-          // Rebuild the chart on the newly rendered canvas and push the data
           this.renderEmptyChartInstance();
           this.updateChartData();
         }, 50);
@@ -113,7 +118,7 @@ fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
   updateChartData() {
     if (!this.chartInstance) return;
 
-    this.chartInstance.data.labels = this.logs.map(log => 
+    this.chartInstance.data.labels = this.logs.map(log =>
       new Date(log.createdAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
     );
     this.chartInstance.data.datasets[0].data = this.logs.map(log => log.value);
@@ -122,13 +127,14 @@ fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
 
   renderEmptyChartInstance() {
     if (!this.trendChartCanvas?.nativeElement) return;
-    
+
     const ctx = this.trendChartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
-      data: { labels: [], datasets: [{
+      data: {
+        labels: [], datasets: [{
           label: 'Mental Baseline Balance',
           data: [],
           borderColor: '#16a34a',
@@ -138,15 +144,19 @@ fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
           fill: true,
           pointBackgroundColor: '#16a34a',
           pointRadius: 4
-      }] },
+        }]
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { min: 1, max: 5, ticks: { stepSize: 1, callback: (value) => 
-            ({ 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' }[Number(value)] || value) 
-          }, grid: { color: '#f1f5f9' } },
+          y: {
+            min: 1, max: 5, ticks: {
+              stepSize: 1, callback: (value) =>
+                ({ 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' }[Number(value)] || value)
+            }, grid: { color: '#f1f5f9' }
+          },
           x: { grid: { display: false } }
         }
       }
@@ -154,9 +164,9 @@ fetchDataForTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
   }
 
   changeTimeframe(filter: '3d' | '7d' | '14d' | '1m') {
-    if (this.activeFilter === filter) return; 
+    if (this.activeFilter === filter) return;
     this.activeFilter = filter;
-    this.fetchDataForTimeframe(filter); 
+    this.fetchDataForTimeframe(filter);
   }
 
   ngOnDestroy() {
