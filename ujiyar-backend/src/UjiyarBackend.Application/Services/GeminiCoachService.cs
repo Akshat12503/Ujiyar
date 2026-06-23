@@ -52,7 +52,7 @@ public class GeminiCoachService : IGeminiCoachService
             var jsonPayload = JsonSerializer.Serialize(payload);
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";;
+            var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";
             
             var response = await _httpClient.PostAsync(endpoint, content);
             
@@ -77,6 +77,55 @@ public class GeminiCoachService : IGeminiCoachService
         {
             Console.WriteLine($"Gemini Service Exception: {ex.Message}");
             return "An internal error occurred while consulting the coach.";
+        }
+    }
+
+    // --- NEW METHOD: AI Chat Moderation Bouncer ---
+    public async Task<string> GenerateModerationResponseAsync(string prompt)
+    {
+        if (string.IsNullOrWhiteSpace(_apiKey))
+        {
+            Console.WriteLine("Gemini API Error: GeminiApiKey is missing for Chat Moderation.");
+            return "SAFE"; // Let the message through if the API is missing so the app doesn't break
+        }
+
+        try
+        {
+            var payload = new
+            {
+                contents = new[]
+                {
+                    new { parts = new[] { new { text = prompt } } }
+                }
+            };
+
+            var jsonPayload = JsonSerializer.Serialize(payload);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";
+            
+            var response = await _httpClient.PostAsync(endpoint, content);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Gemini Moderation API Error: {response.StatusCode} - {errorContent}");
+                return "SAFE"; // Let the message through if the API call fails
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            using var jsonDoc = JsonDocument.Parse(responseString);
+            
+            return jsonDoc.RootElement
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text").GetString() ?? "SAFE";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Gemini Moderation Exception: {ex.Message}");
+            return "SAFE"; // Let the message through if code throws an exception
         }
     }
 }
