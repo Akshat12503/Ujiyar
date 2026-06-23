@@ -37,6 +37,7 @@ builder.Services.AddHttpClient<UjiyarBackend.Application.Services.IGeminiCoachSe
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -53,5 +54,6 @@ app.UseCors("AllowAngularDevClient");
 
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<UjiyarBackend.WebApi.Hubs.ChatHub>("/chatHub");
 
 app.Run();
