@@ -41,25 +41,22 @@ export class CommunityHubComponent implements OnInit, OnDestroy {
       this.currentUser = user;
     }));
 
-    // 2. Start the WebSocket connection
-    this.chatService.startConnection();
-
-    // 3. Listen for live messages
+    // 2. Listen for live messages
     this.subs.add(this.chatService.messages$.subscribe(msgs => {
       this.messages = msgs;
     }));
 
-    // 4. Listen for AI moderation warnings
+    // 3. Listen for AI moderation warnings
     this.subs.add(this.chatService.systemMessage$.subscribe(msg => {
       this.systemWarning = msg;
     }));
 
-    // 5. Join the default room
-    setTimeout(() => {
+    // 4. Start the connection, WAIT for it, and THEN join the room safely
+    this.chatService.startConnection().then(() => {
       this.switchRoom(this.activeRoom);
-    }, 500); // Small delay to ensure connection is established
+    });
   }
-
+  
   ngOnDestroy() {
     this.subs.unsubscribe();
   }

@@ -14,33 +14,29 @@ export class ChatService {
 
   constructor() { }
 
-  public startConnection() {
-    // Note: Ensure 5165 matches your backend port!
+  // Add ": Promise<void>" to the signature
+  public startConnection(): Promise<void> {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5165/chatHub') 
+      .withUrl('http://localhost:5000/chatHub') 
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection
-      .start()
-      .then(() => console.log('Live Chat Connection Started!'))
-      .catch(err => console.log('Error while starting connection: ' + err));
-      
-    // 1. Listen for new messages from other users
+    // Set up listeners BEFORE starting
     this.hubConnection.on('ReceiveMessage', (message) => {
       const currentMessages = this.messages$.getValue();
       this.messages$.next([...currentMessages, message]);
     });
 
-    // 2. Listen for private AI Moderation warnings
     this.hubConnection.on('ReceiveSystemMessage', (message) => {
       this.systemMessage$.next(message);
-      
-      // Auto-clear the warning after 5 seconds
-      setTimeout(() => {
-        this.systemMessage$.next('');
-      }, 5000);
+      setTimeout(() => { this.systemMessage$.next(''); }, 5000);
     });
+
+    // RETURN the start promise so our component can wait for it
+    return this.hubConnection
+      .start()
+      .then(() => console.log('Live Chat Connection Started!'))
+      .catch(err => console.log('Error while starting connection: ' + err));
   }
 
   public joinRoom(roomId: string) {
