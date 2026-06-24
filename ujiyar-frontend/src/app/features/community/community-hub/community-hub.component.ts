@@ -1,85 +1,84 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Post {
-  id: string;
-  authorInitials: string;
-  content: string;
-  timeAgo: string;
-  supportCount: number;
-  hasSupported: boolean;
-}
-
-interface SupportRoom {
-  id: string;
-  title: string;
-  emoji: string;
-  activeCount: number;
-  category: string;
-}
+import { ChatService } from '../../../services/chat.service';
+import { AuthService } from '../../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-community-hub',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './community-hub.component.html'
+  templateUrl: './community-hub.component.html',
+  styleUrls: ['./community-hub.component.css']
 })
-export class CommunityHubComponent {
-  newPostText: string = '';
-
-  // Local Mock Support Room Catalog
-  rooms: SupportRoom[] = [
-    { id: '1', title: 'Navigating Work Burnout', emoji: '💼', activeCount: 14, category: 'Career Balance' },
-    { id: '2', title: 'Mindfulness & Meditation Chat', emoji: '🧘', activeCount: 8, category: 'Daily Calming' },
-    { id: '3', title: 'Overcoming Social Anxiety Together', emoji: '🌱', activeCount: 22, category: 'Anxiety Support' }
+export class CommunityHubComponent implements OnInit, OnDestroy {
+  // These must match the exact GUIDs we seeded in the C# ApplicationDbContext!
+  public safeRooms = [
+    { id: '11111111-1111-1111-1111-111111111111', name: '# venting-space' },
+    { id: '22222222-2222-2222-2222-222222222222', name: '# wins-of-the-day' },
+    { id: '33333333-3333-3333-3333-333333333333', name: '# anxiety-support' }
   ];
 
-  // Local Mock Community Post Timeline
-  posts: Post[] = [
-    {
-      id: '1',
-      authorInitials: 'AM',
-      content: 'Reminding everyone today that progress isn’t linear. If all you did today was breathe and make it through, I’m incredibly proud of you.',
-      timeAgo: '20m ago',
-      supportCount: 12,
-      hasSupported: false
-    },
-    {
-      id: '2',
-      authorInitials: 'SK',
-      content: 'Finally took a 10-minute screen break and stepped outside to look at the trees. Highly recommend trying it if your mind feels clouded right now.',
-      timeAgo: '1h ago',
-      supportCount: 8,
-      hasSupported: true
-    }
-  ];
+  public activeRoom = this.safeRooms[0]; // Default to venting-space
+  public newMessage: string = '';
+  public isGhostMode: boolean = false;
+  
+  public messages: any[] = [];
+  public systemWarning: string = '';
+  public currentUser: any = null;
 
-  createPost() {
-    if (!this.newPostText.trim()) return;
+  private subs: Subscription = new Subscription();
 
-    const freshPost: Post = {
-      id: crypto.randomUUID(),
-      authorInitials: 'ME', // Simulating current User logged initials
-      content: this.newPostText,
-      timeAgo: 'Just now',
-      supportCount: 0,
-      hasSupported: false
-    };
+  constructor(
+    private chatService: ChatService,
+    private authService: AuthService
+  ) {}
 
-    // Prepend to our view array to simulate real-time layout ingestion updates
-    this.posts.unshift(freshPost);
-    this.newPostText = '';
-    console.log('Community post cached locally:', freshPost);
+  ngOnInit() {
+    // 1. Get the logged-in user
+    this.subs.add(this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    }));
+
+    // 2. Start the WebSocket connection
+    this.chatService.startConnection();
+
+    // 3. Listen for live messages
+    this.subs.add(this.chatService.messages$.subscribe(msgs => {
+      this.messages = msgs;
+    }));
+
+    // 4. Listen for AI moderation warnings
+    this.subs.add(this.chatService.systemMessage$.subscribe(msg => {
+      this.systemWarning = msg;
+    }));
+
+    // 5. Join the default room
+    setTimeout(() => {
+      this.switchRoom(this.activeRoom);
+    }, 500); // Small delay to ensure connection is established
   }
 
-  toggleSupport(post: Post) {
-    if (post.hasSupported) {
-      post.supportCount--;
-      post.hasSupported = false;
-    } else {
-      post.supportCount++;
-      post.hasSupported = true;
-    }
+  ngOnDestroy() {
+    this.subs.unsubscribe();
+  }
+
+  switchRoom(room: any) {
+    this.activeRoom = room;
+    this.chatService.joinRoom(room.id);
+  }
+
+  sendMessage() {
+    if (!this.newMessage.trim() || !this.currentUser) return;
+
+    this.chatService.sendMessage(
+      this.activeRoom.id, 
+      this.currentUser.id, 
+      this.newMessage, 
+      this.isGhostMode
+    );
+
+    this.newMessage = ''; // Clear the input box
   }
 }
