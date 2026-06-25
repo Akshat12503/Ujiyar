@@ -24,7 +24,7 @@
     <div class="message-list">
       <div *ngFor="let msg of messages" 
            class="message-wrapper"
-           [class.my-message]="msg.sender === currentUser?.displayName || (isGhostMode && msg.isAnonymous)">
+           [class.my-message]="msg.userId === currentUser?.id">
         
         <div class="message-bubble">
           <span class="sender-name">{{ msg.sender }}</span>

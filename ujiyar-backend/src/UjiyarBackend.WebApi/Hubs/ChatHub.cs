@@ -34,6 +34,7 @@ public class ChatHub : Hub
             {
                 id = m.Id,
                 roomId = m.RoomId,
+                userId = m.UserId,
                 sender = m.IsAnonymous ? "Anonymous Member" : m.User.DisplayName,
                 content = m.Content,
                 isAnonymous = m.IsAnonymous,
@@ -118,6 +119,7 @@ public class ChatHub : Hub
         {
             id = message.Id,
             roomId = message.RoomId,
+            userId = message.UserId,
             sender = senderName,
             content = message.Content,
             isAnonymous = message.IsAnonymous,

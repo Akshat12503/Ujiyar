@@ -11,6 +11,7 @@ export class ChatService {
   // These act as live streams that our UI will listen to
   public messages$ = new BehaviorSubject<any[]>([]);
   public systemMessage$ = new BehaviorSubject<string>('');
+  private currentRoomId: string = '';
 
   constructor() { }
 
@@ -27,8 +28,11 @@ export class ChatService {
       .build();
 
     this.hubConnection.on('ReceiveMessage', (message) => {
-      const currentMessages = this.messages$.getValue();
-      this.messages$.next([...currentMessages, message]);
+      // THE FIX: Only display the message if it belongs to the room we are looking at!
+      if (message.roomId === this.currentRoomId) {
+        const currentMessages = this.messages$.getValue();
+        this.messages$.next([...currentMessages, message]);
+      }
     });
 
     // --- ADD THIS NEW LISTENER FOR ISSUE 2 ---
@@ -51,10 +55,20 @@ export class ChatService {
   public joinRoom(roomId: string) {
     if (!this.hubConnection) return;
     
-    // Clear previous messages when switching rooms
+    // 1. If we were in a room previously, tell C# to unsubscribe us from it
+    if (this.currentRoomId) {
+      this.hubConnection.invoke('LeaveRoom', this.currentRoomId)
+        .catch(err => console.error('Error leaving room:', err));
+    }
+
+    // 2. Update our tracker to the new room
+    this.currentRoomId = roomId;
+
+    // 3. Clear the UI
     this.messages$.next([]); 
     this.systemMessage$.next('');
 
+    // 4. Join the new room
     this.hubConnection.invoke('JoinRoom', roomId)
       .catch(err => console.error('Error joining room:', err));
   }
