@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core'; // <-- 1. Import NgZone
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
 
@@ -8,16 +8,15 @@ import { BehaviorSubject } from 'rxjs';
 export class ChatService {
   private hubConnection: signalR.HubConnection | undefined;
   
-  // These act as live streams that our UI will listen to
   public messages$ = new BehaviorSubject<any[]>([]);
   public systemMessage$ = new BehaviorSubject<string>('');
+  
   private currentRoomId: string = '';
 
-  constructor() { }
+  // 2. Inject NgZone into the constructor
+  constructor(private zone: NgZone) { }
 
-  // Add ": Promise<void>" to the signature
   public startConnection(): Promise<void> {
-    // 1. THE FIX: If we are already connected, stop here!
     if (this.hubConnection) {
       return Promise.resolve();
     }
@@ -27,23 +26,28 @@ export class ChatService {
       .withAutomaticReconnect()
       .build();
 
+    // 3. Wrap all incoming listeners in this.zone.run() so Angular knows to redraw!
     this.hubConnection.on('ReceiveMessage', (message) => {
-      // THE FIX: Only display the message if it belongs to the room we are looking at!
-      if (message.roomId === this.currentRoomId) {
-        const currentMessages = this.messages$.getValue();
-        this.messages$.next([...currentMessages, message]);
+      // Use toLowerCase() just in case C# sent the GUID in uppercase
+      if (message.roomId.toLowerCase() === this.currentRoomId.toLowerCase()) {
+        this.zone.run(() => {
+          const currentMessages = this.messages$.getValue();
+          this.messages$.next([...currentMessages, message]);
+        });
       }
     });
 
-    // --- ADD THIS NEW LISTENER FOR ISSUE 2 ---
     this.hubConnection.on('LoadHistory', (history: any[]) => {
-      this.messages$.next(history);
+      this.zone.run(() => {
+        this.messages$.next(history);
+      });
     });
-    // -----------------------------------------
 
     this.hubConnection.on('ReceiveSystemMessage', (message) => {
-      this.systemMessage$.next(message);
-      setTimeout(() => { this.systemMessage$.next(''); }, 5000);
+      this.zone.run(() => {
+        this.systemMessage$.next(message);
+        setTimeout(() => { this.systemMessage$.next(''); }, 5000);
+      });
     });
 
     return this.hubConnection
@@ -55,20 +59,15 @@ export class ChatService {
   public joinRoom(roomId: string) {
     if (!this.hubConnection) return;
     
-    // 1. If we were in a room previously, tell C# to unsubscribe us from it
     if (this.currentRoomId) {
       this.hubConnection.invoke('LeaveRoom', this.currentRoomId)
         .catch(err => console.error('Error leaving room:', err));
     }
 
-    // 2. Update our tracker to the new room
     this.currentRoomId = roomId;
-
-    // 3. Clear the UI
     this.messages$.next([]); 
     this.systemMessage$.next('');
 
-    // 4. Join the new room
     this.hubConnection.invoke('JoinRoom', roomId)
       .catch(err => console.error('Error joining room:', err));
   }
