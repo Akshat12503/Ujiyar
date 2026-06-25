@@ -16,23 +16,32 @@ export class ChatService {
 
   // Add ": Promise<void>" to the signature
   public startConnection(): Promise<void> {
+    // 1. THE FIX: If we are already connected, stop here!
+    if (this.hubConnection) {
+      return Promise.resolve();
+    }
+
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('http://localhost:5000/chatHub') 
       .withAutomaticReconnect()
       .build();
 
-    // Set up listeners BEFORE starting
     this.hubConnection.on('ReceiveMessage', (message) => {
       const currentMessages = this.messages$.getValue();
       this.messages$.next([...currentMessages, message]);
     });
+
+    // --- ADD THIS NEW LISTENER FOR ISSUE 2 ---
+    this.hubConnection.on('LoadHistory', (history: any[]) => {
+      this.messages$.next(history);
+    });
+    // -----------------------------------------
 
     this.hubConnection.on('ReceiveSystemMessage', (message) => {
       this.systemMessage$.next(message);
       setTimeout(() => { this.systemMessage$.next(''); }, 5000);
     });
 
-    // RETURN the start promise so our component can wait for it
     return this.hubConnection
       .start()
       .then(() => console.log('Live Chat Connection Started!'))

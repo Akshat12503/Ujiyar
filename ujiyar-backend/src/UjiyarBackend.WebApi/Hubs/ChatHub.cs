@@ -20,7 +20,29 @@ public class ChatHub : Hub
 
     public async Task JoinRoom(string roomId)
     {
+        // 1. Add the user to the live broadcast group
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+
+        var roomGuid = Guid.Parse(roomId);
+
+        // 2. Reach into PostgreSQL and grab the historical messages for this room
+        var history = await _context.ChatMessages
+            .Include(m => m.User) // Bring in the user data so we know who sent it
+            .Where(m => m.RoomId == roomGuid)
+            .OrderBy(m => m.CreatedAt) // Sort oldest to newest
+            .Select(m => new 
+            {
+                id = m.Id,
+                roomId = m.RoomId,
+                sender = m.IsAnonymous ? "Anonymous Member" : m.User.DisplayName,
+                content = m.Content,
+                isAnonymous = m.IsAnonymous,
+                createdAt = m.CreatedAt
+            })
+            .ToListAsync();
+
+        // 3. Send the history ONLY to the specific user who just joined the room
+        await Clients.Caller.SendAsync("LoadHistory", history);
     }
 
     public async Task SendMessage(string roomId, string userId, string content, bool isAnonymous)
