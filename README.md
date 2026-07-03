@@ -83,16 +83,17 @@ Bash
 ng serve
 Open your browser and navigate to http://localhost:4200.
 
-🏗️ System Architecture Highlights
+## 🏗️ System Architecture Highlights
+
 Real-Time State Management: Utilizes Angular's NgZone and RxJS BehaviorSubject to manage asynchronous WebSocket streams, ensuring the UI remains perfectly synchronized with backend broadcasts.
 
 Isolated Database Contexts: The Entity Framework architecture strictly maps relationships between Users, ChatRooms, and ChatMessages using foreign keys, allowing for immediate historical message retrieval upon joining a room.
 
 Secure API Handling: API keys are excluded from source control using .NET Secret Manager, preventing accidental exposure to GitHub's public repositories.
 
-👨‍💻 Author
+## 👨‍💻 Author
+
 Akshat Kutariyar
-Systems Engineer
 
 Designed and engineered as a full-stack technical initiative.
    ```bash
