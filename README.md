@@ -68,7 +68,7 @@ Run the backend server (Defaults to http://localhost:5000):
 Bash
 dotnet run --project src/UjiyarBackend.WebApi
 
-2. Frontend Setup
+### 2. Frontend Setup
 Open a new terminal and navigate to the frontend folder:
 
 Bash
