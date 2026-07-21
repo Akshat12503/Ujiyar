@@ -126,6 +126,10 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
   }
 
   renderEmptyChartInstance() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255,255,255,0.08)' : '#F0EDE4';
+    const tickColor = isDark ? '#9BA8AC' : '#6B7A80';
+
     if (!this.trendChartCanvas?.nativeElement) return;
 
     const ctx = this.trendChartCanvas.nativeElement.getContext('2d');

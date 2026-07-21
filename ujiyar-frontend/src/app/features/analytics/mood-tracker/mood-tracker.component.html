@@ -1,11 +1,11 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
   <div class="lg:col-span-2 space-y-6">
-    <div class="bg-white p-7 md:p-8 rounded-3xl shadow-sm border border-[#37474F]/5 space-y-7 animate-fade-up">
+    <div class="bg-white dark:bg-[#252D31] p-7 md:p-8 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 space-y-7 animate-fade-up">
 
       <div>
-        <h3 class="text-xl font-bold text-[#37474F]">How is your mind space right now?</h3>
-        <p class="text-[#6B7A80] text-sm mt-1">Choose whatever feels closest to how you're doing today. There's no wrong answer.</p>
+        <h3 class="text-xl font-bold text-[#37474F] dark:text-[#E5E9EA]">How is your mind space right now?</h3>
+        <p class="text-[#6B7A80] dark:text-[#9BA8AC] text-sm mt-1">Choose whatever feels closest to how you're doing today. There's no wrong answer.</p>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -13,7 +13,7 @@
           *ngFor="let mood of moods"
           (click)="selectMood(mood)"
           type="button"
-          [class]="selectedMood?.label === mood.label ? mood.colorClass + ' ring-2 ring-offset-2 ring-offset-white' : 'bg-white border-[#37474F]/10 text-[#37474F] hover:bg-[#FAF8F3]'"
+          [class]="selectedMood?.label === mood.label ? mood.colorClass + ' ring-2 ring-offset-2 dark:ring-offset-[#252D31] ring-offset-white' : 'bg-white dark:bg-white/5 border-[#37474F]/10 dark:border-white/10 text-[#37474F] dark:text-[#E5E9EA] hover:bg-[#FAF8F3] dark:hover:bg-white/10'"
           class="flex flex-col items-center p-4 border rounded-2xl transition-all duration-300 group text-center">
           <span class="text-2xl group-hover:scale-110 transition-transform duration-300 mb-1.5">{{ mood.emoji }}</span>
           <span class="text-xs font-semibold tracking-wide">{{ mood.label }}</span>
@@ -21,21 +21,21 @@
       </div>
 
       <div class="space-y-2">
-        <label class="block text-xs font-semibold uppercase tracking-wider text-[#6B7A80]">Your Reflection</label>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-[#6B7A80] dark:text-[#9BA8AC]">Your Reflection</label>
         <textarea
           [(ngModel)]="journalText"
           rows="4"
-          class="w-full px-4 py-3.5 bg-[#FAF8F3] border border-[#37474F]/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#A8C5A0]/30 focus:border-[#A8C5A0] text-[#37474F] transition-all duration-300 text-sm resize-none placeholder:text-[#6B7A80]/60"
+          class="w-full px-4 py-3.5 bg-[#FAF8F3] dark:bg-white/5 border border-[#37474F]/10 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#A8C5A0]/30 focus:border-[#A8C5A0] text-[#37474F] dark:text-[#E5E9EA] transition-all duration-300 text-sm resize-none placeholder:text-[#6B7A80]/60 dark:placeholder:text-[#9BA8AC]/50"
           placeholder="Whatever's on your mind, this space is just for you..."></textarea>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-[#37474F]/5">
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-[#37474F]/5 dark:border-white/8">
         <label class="flex items-center space-x-2 cursor-pointer select-none pt-4">
           <input
             type="checkbox"
             [(ngModel)]="isAnonymous"
-            class="h-4 w-4 rounded text-[#A8C5A0] focus:ring-[#A8C5A0]/40 border-[#37474F]/20">
-          <span class="text-xs text-[#6B7A80] font-medium">Keep this entry private to my safe space</span>
+            class="h-4 w-4 rounded text-[#A8C5A0] focus:ring-[#A8C5A0]/40 border-[#37474F]/20 dark:border-white/20">
+          <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-medium">Keep this entry private to my safe space</span>
         </label>
 
         <button
@@ -50,36 +50,36 @@
         </button>
       </div>
 
-      <div *ngIf="aiCoachResponse" class="p-5 bg-[#88AFCB]/8 border border-[#88AFCB]/20 rounded-2xl animate-fade-up">
+      <div *ngIf="aiCoachResponse" class="p-5 bg-[#88AFCB]/8 dark:bg-[#88AFCB]/10 border border-[#88AFCB]/20 dark:border-[#88AFCB]/20 rounded-2xl animate-fade-up">
         <div class="flex items-center gap-2 mb-2">
           <div class="h-7 w-7 rounded-full bg-[#88AFCB]/15 flex items-center justify-center text-sm">🤍</div>
-          <h4 class="text-sm font-semibold text-[#37474F]">A gentle thought from your coach</h4>
+          <h4 class="text-sm font-semibold text-[#37474F] dark:text-[#E5E9EA]">A gentle thought from your coach</h4>
         </div>
-        <p class="text-sm text-[#37474F]/85 leading-relaxed">{{ aiCoachResponse }}</p>
+        <p class="text-sm text-[#37474F]/85 dark:text-[#E5E9EA]/85 leading-relaxed">{{ aiCoachResponse }}</p>
       </div>
     </div>
   </div>
 
   <div class="space-y-4">
-    <h4 class="text-xs font-semibold uppercase tracking-wider text-[#6B7A80] px-1">Recent Reflections</h4>
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-[#6B7A80] dark:text-[#9BA8AC] px-1">Recent Reflections</h4>
 
-    <div *ngIf="loggedEntries.length === 0" class="bg-white/60 border border-dashed border-[#37474F]/15 p-8 rounded-3xl text-center">
+    <div *ngIf="loggedEntries.length === 0" class="bg-white/60 dark:bg-white/5 border border-dashed border-[#37474F]/15 dark:border-white/15 p-8 rounded-3xl text-center">
       <div class="text-3xl mb-2 opacity-60">🌱</div>
-      <p class="text-[#6B7A80] text-xs">Your reflections will show up here as you check in.</p>
+      <p class="text-[#6B7A80] dark:text-[#9BA8AC] text-xs">Your reflections will show up here as you check in.</p>
     </div>
 
     <div
       *ngFor="let entry of loggedEntries; let i = index"
-      class="bg-white p-5 rounded-2xl shadow-sm border border-[#37474F]/5 space-y-2 card-hover animate-fade-up"
+      class="bg-white dark:bg-[#252D31] p-5 rounded-2xl shadow-sm border border-[#37474F]/5 dark:border-white/8 space-y-2 card-hover animate-fade-up"
       [style.animation-delay.ms]="i * 60">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="text-lg">{{ entry.mood.emoji }}</span>
-          <span class="text-xs font-semibold text-[#37474F]">{{ entry.mood.label }}</span>
+          <span class="text-xs font-semibold text-[#37474F] dark:text-[#E5E9EA]">{{ entry.mood.label }}</span>
         </div>
-        <span class="text-xs text-[#6B7A80]">{{ entry.date | date:'shortTime' }}</span>
+        <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC]">{{ entry.date | date:'shortTime' }}</span>
       </div>
-      <p class="text-xs text-[#37474F]/80 line-clamp-3 leading-relaxed break-words" *ngIf="entry.note">
+      <p class="text-xs text-[#37474F]/80 dark:text-[#E5E9EA]/80 line-clamp-3 leading-relaxed break-words" *ngIf="entry.note">
         {{ entry.note }}
       </p>
     </div>
