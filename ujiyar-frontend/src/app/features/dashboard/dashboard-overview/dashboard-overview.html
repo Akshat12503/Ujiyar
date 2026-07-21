@@ -1,40 +1,80 @@
-<div class="space-y-10">
+<div class="space-y-8">
 
   <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#A8C5A0]/20 dark:from-[#A8C5A0]/10 via-[#FAF8F3] dark:via-[#252D31] to-[#88AFCB]/10 dark:to-[#88AFCB]/5 border border-[#37474F]/5 dark:border-white/8 p-8 md:p-10 animate-fade-up">
     <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#A8C5A0]/15 blur-2xl"></div>
     <div class="absolute right-20 bottom-0 h-24 w-24 rounded-full bg-[#88AFCB]/15 blur-2xl"></div>
 
     <div class="relative">
-      <span class="text-xs font-semibold text-[#5C7A56] dark:text-[#A8C5A0] bg-white/60 dark:bg-white/10 px-3 py-1 rounded-full">Good to see you</span>
+      <span class="text-xs font-semibold text-[#5C7A56] dark:text-[#A8C5A0] bg-white/60 dark:bg-white/10 px-3 py-1 rounded-full">{{ greeting }}</span>
       <h2 class="text-3xl md:text-4xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-4 tracking-tight">Your Reflection Space</h2>
       <p class="text-[#6B7A80] dark:text-[#9BA8AC] text-sm md:text-base mt-2 max-w-md">A quiet place to notice your patterns, one gentle check-in at a time.</p>
+
+      <div class="flex items-center gap-2 mt-6">
+        <span class="text-[10px] font-semibold text-[#6B7A80] dark:text-[#9BA8AC] uppercase tracking-wider mr-1">This week</span>
+        <div *ngFor="let day of weekGlance" class="flex flex-col items-center gap-1.5">
+          <span
+            [class]="day.logged ? day.colorClass : 'bg-white/40 dark:bg-white/5 border-dashed border-[#37474F]/15 dark:border-white/15'"
+            class="h-7 w-7 rounded-full border flex items-center justify-center text-[11px]">
+            {{ day.logged ? day.emoji : '' }}
+          </span>
+          <span class="text-[9px] text-[#6B7A80] dark:text-[#9BA8AC] font-medium">{{ day.label }}</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <div class="bg-white dark:bg-[#252D31] p-6 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up" style="animation-delay: 60ms">
-      <div class="h-10 w-10 rounded-xl bg-[#A8C5A0]/15 flex items-center justify-center text-lg mb-3">📝</div>
-      <div class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold tracking-wide">Today's Check-in</div>
-      <div class="text-xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1">Not logged yet</div>
-      <p class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] mt-1">Take a moment for yourself today</p>
-    </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-    <div class="bg-white dark:bg-[#252D31] p-6 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up" style="animation-delay: 120ms">
-      <div class="h-10 w-10 rounded-xl bg-[#6FAFA8]/15 flex items-center justify-center text-lg mb-3">🤍</div>
-      <div class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold tracking-wide">Your Companion</div>
-      <div class="text-xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1">Ready to chat</div>
-      <p class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] mt-1">Available anytime you need it</p>
-    </div>
+    <a
+      href="#mood-tracker-section"
+      class="lg:col-span-2 group relative overflow-hidden bg-white dark:bg-[#252D31] p-7 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up flex flex-col justify-between"
+      style="animation-delay: 60ms">
+      <div class="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-[#A8C5A0]/8 group-hover:scale-110 transition-transform duration-500"></div>
 
-    <div class="bg-white dark:bg-[#252D31] p-6 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up" style="animation-delay: 180ms">
-      <div class="h-10 w-10 rounded-xl bg-[#88AFCB]/15 flex items-center justify-center text-lg mb-3">👥</div>
-      <div class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold tracking-wide">Safe Space Rooms</div>
-      <div class="text-xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1">4 Active</div>
-      <p class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] mt-1">Join a supportive conversation</p>
+      <div class="relative flex items-start justify-between">
+        <div class="h-12 w-12 rounded-2xl bg-[#A8C5A0]/15 flex items-center justify-center text-xl">📝</div>
+        <span class="text-[10px] font-semibold text-[#5C7A56] dark:text-[#A8C5A0] bg-[#A8C5A0]/10 px-2.5 py-1 rounded-full">Today</span>
+      </div>
+
+      <div class="relative mt-6">
+        <div class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold tracking-wide">Today's Check-in</div>
+        <div class="text-2xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1">Not logged yet</div>
+        <p class="text-sm text-[#6B7A80] dark:text-[#9BA8AC] mt-2 max-w-sm">Two minutes is enough. Notice how you feel, write a line if you want to.</p>
+      </div>
+
+      <div class="relative flex items-center gap-2 mt-6 text-sm font-semibold text-[#5C7A56] dark:text-[#A8C5A0]">
+        Start today's check-in
+        <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+      </div>
+    </a>
+
+    <div class="flex flex-col gap-5">
+      <a routerLink="/dashboard/ai-companion" class="group relative overflow-hidden bg-white dark:bg-[#252D31] p-5 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up flex items-center gap-4" style="animation-delay: 120ms">
+        <div class="h-11 w-11 rounded-2xl bg-[#6FAFA8]/15 flex items-center justify-center text-lg shrink-0">🤍</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold">Your Companion</span>
+            <span class="relative flex h-1.5 w-1.5 shrink-0">
+              <span class="animate-breathe absolute inline-flex h-full w-full rounded-full bg-[#6FAFA8]"></span>
+            </span>
+          </div>
+          <div class="text-sm font-bold text-[#37474F] dark:text-[#E5E9EA] mt-0.5">Ready to chat</div>
+        </div>
+        <span class="text-[#6B7A80] dark:text-[#9BA8AC] group-hover:translate-x-1 transition-transform duration-300 shrink-0">→</span>
+      </a>
+
+      <a routerLink="/dashboard/community" class="group relative overflow-hidden bg-white dark:bg-[#252D31] p-5 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 card-hover animate-fade-up flex items-center gap-4" style="animation-delay: 180ms">
+        <div class="h-11 w-11 rounded-2xl bg-[#88AFCB]/15 flex items-center justify-center text-lg shrink-0">👥</div>
+        <div class="flex-1 min-w-0">
+          <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] font-semibold">Safe Space Rooms</span>
+          <div class="text-sm font-bold text-[#37474F] dark:text-[#E5E9EA] mt-0.5">4 active right now</div>
+        </div>
+        <span class="text-[#6B7A80] dark:text-[#9BA8AC] group-hover:translate-x-1 transition-transform duration-300 shrink-0">→</span>
+      </a>
     </div>
   </div>
 
-  <div>
+  <div id="mood-tracker-section">
     <app-analytics-dashboard></app-analytics-dashboard>
   </div>
 

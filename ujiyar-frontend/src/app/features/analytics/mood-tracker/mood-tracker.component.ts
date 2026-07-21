@@ -26,6 +26,13 @@ export class MoodTrackerComponent implements OnInit {
     { emoji: '⛈️', label: 'Overwhelmed', colorClass: 'border-[#A597C4] bg-[#A597C4]/12 text-[#5D4E80] ring-[#A597C4]', value: 1 }
   ];
 
+  getSpectrumWidth(): number {
+    if (!this.selectedMood) return 0;
+    const index = this.moods.findIndex(m => m.label === this.selectedMood?.label);
+    const total = this.moods.length - 1;
+    return (index / total) * 100;
+  }
+
   selectedMood: MoodOption | null = null;
   journalText: string = '';
   isAnonymous: boolean = false;
