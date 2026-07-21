@@ -2,7 +2,7 @@
 
   <div class="flex items-center justify-between animate-fade-up">
     <div>
-      <h1 class="text-2xl font-bold text-[#37474F] dark:text-[#E5E9EA] tracking-tight">Your Mind Space</h1>
+      <h1 class="text-2xl font-medium text-[#37474F] dark:text-[#E5E9EA] tracking-tight" style="font-family: var(--font-display);">Your mind space</h1>
       <p class="text-sm text-[#6B7A80] dark:text-[#9BA8AC] mt-1">A gentle look at how you've been feeling</p>
     </div>
     <button
@@ -26,7 +26,7 @@
       <div class="bg-white dark:bg-[#252D31] p-6 rounded-3xl border border-[#37474F]/5 dark:border-white/8 shadow-sm flex items-center justify-between card-hover animate-fade-up">
         <div>
           <p class="text-xs font-semibold text-[#6B7A80] dark:text-[#9BA8AC] tracking-wide">Journal Entries</p>
-          <h3 class="text-3xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1.5" *ngIf="totalReflections > 0">{{ totalReflections }}</h3>
+          <h3 class="text-3xl font-medium text-[#37474F] dark:text-[#E5E9EA] mt-1.5" style="font-family: var(--font-data);" *ngIf="totalReflections > 0">{{ totalReflections }}</h3>
           <div *ngIf="totalReflections === 0" class="mt-1.5">
             <p class="text-sm text-[#88AFCB] font-medium">Your story starts here</p>
           </div>
@@ -41,8 +41,8 @@
       <div class="bg-white dark:bg-[#252D31] p-6 rounded-3xl border border-[#37474F]/5 dark:border-white/8 shadow-sm flex items-center justify-between card-hover animate-fade-up" style="animation-delay: 80ms">
         <div>
           <p class="text-xs font-semibold text-[#6B7A80] dark:text-[#9BA8AC] tracking-wide">Average Baseline</p>
-          <h3 class="text-3xl font-bold text-[#37474F] dark:text-[#E5E9EA] mt-1.5" *ngIf="totalReflections > 0">
-            {{ averageMood }} <span class="text-base font-medium text-[#6B7A80] dark:text-[#9BA8AC]">/ 5</span>
+          <h3 class="text-3xl font-medium text-[#37474F] dark:text-[#E5E9EA] mt-1.5" style="font-family: var(--font-data);" *ngIf="totalReflections > 0">
+            {{ averageMood }} <span class="text-base text-[#6B7A80] dark:text-[#9BA8AC]">/ 5</span>
           </h3>
           <div *ngIf="totalReflections === 0" class="mt-1.5">
             <p class="text-sm text-[#88AFCB] font-medium">Not enough data yet</p>
@@ -58,7 +58,7 @@
 
     <div class="bg-white dark:bg-[#252D31] p-6 md:p-7 rounded-3xl border border-[#37474F]/5 dark:border-white/8 shadow-sm animate-fade-up" style="animation-delay: 140ms">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h3 class="text-sm font-semibold text-[#37474F] dark:text-[#E5E9EA]">Baseline Trend</h3>
+        <h3 class="text-sm font-medium text-[#37474F] dark:text-[#E5E9EA]" style="font-family: var(--font-display);">Baseline trend</h3>
 
         <div class="flex bg-[#FAF8F3] dark:bg-white/5 p-1 rounded-xl border border-[#37474F]/5 dark:border-white/8">
           <button (click)="changeTimeframe('3d')" [class]="activeFilter === '3d' ? 'bg-white dark:bg-[#37474F] text-[#37474F] dark:text-white shadow-sm' : 'text-[#6B7A80] dark:text-[#9BA8AC]'" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300">3D</button>
@@ -80,7 +80,7 @@
     </div>
 
     <div class="bg-white dark:bg-[#252D31] p-6 md:p-7 rounded-3xl border border-[#37474F]/5 dark:border-white/8 shadow-sm space-y-1 animate-fade-up" style="animation-delay: 200ms">
-      <h3 class="text-sm font-semibold text-[#37474F] dark:text-[#E5E9EA] mb-4">Recent Reflections</h3>
+      <h3 class="text-sm font-medium text-[#37474F] dark:text-[#E5E9EA] mb-4" style="font-family: var(--font-display);">Recent reflections</h3>
 
       <div *ngIf="logs.length === 0" class="py-8 text-center text-sm text-[#6B7A80] dark:text-[#9BA8AC]">
         Nothing logged for this timeframe yet.
@@ -93,7 +93,7 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm text-[#37474F] dark:text-[#E5E9EA] leading-relaxed break-words">{{ log.journalNote }}</p>
-            <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] mt-1 block">{{ log.createdAt | date:'medium' }}</span>
+            <span class="text-xs text-[#6B7A80] dark:text-[#9BA8AC] mt-1 block" style="font-family: var(--font-data);">{{ log.createdAt | date:'medium' }}</span>
           </div>
         </div>
       </div>

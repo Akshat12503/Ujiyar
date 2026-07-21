@@ -88,7 +88,6 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
 
     this.moodLogService.getRecentLogs(this.currentUserId, daysToFetch).subscribe({
       next: (rawData: any[]) => {
-        console.log(`Fetched data for ${filter}: ${rawData.length} entries found.`);
         this.logs = rawData.map(item => ({
           id: item.id || item.Id,
           value: Number(item.value || item.Value || 3),
@@ -147,7 +146,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
           tension: 0.4,
           fill: true,
           pointBackgroundColor: '#6FAFA8',
-          pointBorderColor: '#FFFFFF',
+          pointBorderColor: isDark ? '#252D31' : '#FFFFFF',
           pointBorderWidth: 2,
           pointRadius: 5,
           pointHoverRadius: 7
@@ -160,11 +159,11 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
         scales: {
           y: {
             min: 1, max: 5, ticks: {
-              stepSize: 1, callback: (value) =>
+              stepSize: 1, color: tickColor, callback: (value) =>
                 ({ 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' }[Number(value)] || value)
-            }, grid: { color: '#F0EDE4' }
+            }, grid: { color: gridColor }
           },
-          x: { grid: { display: false }, ticks: { color: '#6B7A80' } }
+          x: { grid: { display: false }, ticks: { color: tickColor } }
         }
       }
     });

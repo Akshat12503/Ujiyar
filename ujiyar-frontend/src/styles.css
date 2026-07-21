@@ -19,6 +19,9 @@
   --color-mood-overwhelmed: #A597C4;
 
   --ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-data: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @layer base {
@@ -44,64 +47,3 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.85; } }
-
-@theme {
-  /* Core wellness palette */
-  --color-wellness-primary: #A8C5A0;      /* Sage Green */
-  --color-wellness-primary-dark: #8FB088;
-  --color-wellness-secondary: #6FAFA8;    /* Soft Teal */
-  --color-wellness-accent: #88AFCB;       /* Dusty Blue */
-  --color-wellness-bg: #FAF8F3;           /* Warm Ivory */
-  --color-wellness-surface: #FFFFFF;
-  --color-wellness-text: #37474F;         /* Deep Slate */
-  --color-wellness-text-soft: #6B7A80;
-
-  /* Mood accent tints (kept soft, not clinical primary colors) */
-  --color-mood-radiant: #E8B86D;
-  --color-mood-calm: #A8C5A0;
-  --color-mood-tired: #B8C4C8;
-  --color-mood-anxious: #88AFCB;
-  --color-mood-overwhelmed: #A597C4;
-
-  /* Motion */
-  --ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@layer base {
-  body {
-    background-color: var(--color-wellness-bg);
-    color: var(--color-wellness-text);
-  }
-}
-
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.6s var(--ease-gentle) both;
-  }
-  .animate-fade-up {
-    animation: fadeUp 0.5s var(--ease-gentle) both;
-  }
-  .animate-breathe {
-    animation: breathe 3s ease-in-out infinite;
-  }
-  .card-hover {
-    transition: transform 0.35s var(--ease-gentle), box-shadow 0.35s var(--ease-gentle);
-  }
-  .card-hover:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px -8px rgba(168, 197, 160, 0.35);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.06); opacity: 0.85; }
-}

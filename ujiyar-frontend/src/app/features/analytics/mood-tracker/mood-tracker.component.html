@@ -3,31 +3,52 @@
   <div class="lg:col-span-3 bg-white dark:bg-[#252D31] p-7 md:p-9 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 space-y-8 animate-fade-up">
 
     <div>
-      <h3 class="text-xl font-bold text-[#37474F] dark:text-[#E5E9EA]">How is your mind space right now?</h3>
-      <p class="text-[#6B7A80] dark:text-[#9BA8AC] text-sm mt-1">Choose whatever feels closest to how you're doing today.</p>
+      <h3 class="text-xl font-medium text-[#37474F] dark:text-[#E5E9EA]" style="font-family: var(--font-display);">How is your mind space right now?</h3>
+      <p class="text-[#6B7A80] dark:text-[#9BA8AC] text-sm mt-1">Turn the dial to whatever feels closest to how you're doing today.</p>
     </div>
 
-    <div class="relative pt-2 pb-4">
-      <div class="absolute top-9 left-6 right-6 h-0.5 bg-[#37474F]/8 dark:bg-white/10 rounded-full"></div>
-      <div
-        class="absolute top-9 left-6 h-0.5 bg-gradient-to-r from-[#A597C4] via-[#A8C5A0] to-[#E8B86D] rounded-full transition-all duration-500"
-        [style.width.%]="selectedMood ? getSpectrumWidth() : 0">
-      </div>
+    <div class="pt-2 pb-1">
+      <div class="relative mx-auto" style="max-width: 320px;">
+        <svg viewBox="0 0 300 165" class="w-full">
+          <path
+            d="M 30 150 A 120 120 0 0 1 270 150"
+            fill="none"
+            stroke="currentColor"
+            class="text-[#37474F]/10 dark:text-white/10"
+            stroke-width="4"
+            stroke-linecap="round" />
 
-      <div class="relative flex justify-between">
+          <line
+            [attr.x1]="dialCenter.x" [attr.y1]="dialCenter.y"
+            [attr.x2]="needleEnd.x" [attr.y2]="needleEnd.y"
+            [attr.stroke]="needleColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            class="transition-all duration-500 ease-out" />
+          <circle [attr.cx]="dialCenter.x" [attr.cy]="dialCenter.y" r="5" [attr.fill]="needleColor" class="transition-all duration-500" />
+
+          <g *ngFor="let mood of moods">
+            <circle
+              [attr.cx]="getTickPosition(mood).x" [attr.cy]="getTickPosition(mood).y"
+              [attr.r]="selectedMood?.label === mood.label ? 7 : 4"
+              [attr.fill]="selectedMood?.label === mood.label ? mood.dotColor : '#B8C4C8'"
+              class="transition-all duration-300" />
+          </g>
+        </svg>
+
         <button
           *ngFor="let mood of moods"
           (click)="selectMood(mood)"
           type="button"
-          class="flex flex-col items-center gap-2 group">
+          [attr.aria-label]="mood.label"
+          [attr.aria-pressed]="selectedMood?.label === mood.label"
+          class="absolute flex flex-col items-center gap-1 -translate-x-1/2 group"
+          [style.left.%]="(getTickPosition(mood).x / 300) * 100"
+          [style.top.%]="(getTickPosition(mood).y / 165) * 100 - 15">
+          <span class="text-xl transition-transform duration-300 group-hover:scale-125" [class.scale-125]="selectedMood?.label === mood.label">{{ mood.emoji }}</span>
           <span
-            [class]="selectedMood?.label === mood.label ? mood.colorClass + ' scale-125 shadow-lg' : 'bg-white dark:bg-white/5 border-[#37474F]/10 dark:border-white/10 scale-100'"
-            class="h-14 w-14 rounded-full border-2 flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-110 relative z-10">
-            {{ mood.emoji }}
-          </span>
-          <span
-            [class]="selectedMood?.label === mood.label ? 'text-[#37474F] dark:text-[#E5E9EA] font-bold' : 'text-[#6B7A80] dark:text-[#9BA8AC] font-medium'"
-            class="text-[11px] transition-all duration-300">
+            [class]="selectedMood?.label === mood.label ? mood.colorClass + ' font-medium' : 'text-[#6B7A80] dark:text-[#9BA8AC]'"
+            class="text-[10px] whitespace-nowrap transition-colors duration-300">
             {{ mood.label }}
           </span>
         </button>
@@ -74,7 +95,7 @@
   </div>
 
   <div class="lg:col-span-2 bg-white dark:bg-[#252D31] p-6 md:p-7 rounded-3xl shadow-sm border border-[#37474F]/5 dark:border-white/8 animate-fade-up" style="animation-delay: 80ms">
-    <h4 class="text-xs font-semibold uppercase tracking-wider text-[#6B7A80] dark:text-[#9BA8AC] mb-6">Recent Reflections</h4>
+    <h4 class="text-sm font-medium text-[#37474F] dark:text-[#E5E9EA] mb-6" style="font-family: var(--font-display);">Recent reflections</h4>
 
     <div *ngIf="loggedEntries.length === 0" class="py-10 text-center">
       <div class="text-3xl mb-2 opacity-60">🌱</div>
@@ -94,8 +115,8 @@
         </span>
 
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs font-semibold text-[#37474F] dark:text-[#E5E9EA]">{{ entry.mood.label }}</span>
-          <span class="text-[10px] text-[#6B7A80] dark:text-[#9BA8AC]">{{ entry.date | date:'shortTime' }}</span>
+          <span class="text-xs font-medium text-[#37474F] dark:text-[#E5E9EA]">{{ entry.mood.label }}</span>
+          <span class="text-[10px] text-[#6B7A80] dark:text-[#9BA8AC]" style="font-family: var(--font-data);">{{ entry.date | date:'shortTime' }}</span>
         </div>
         <p class="text-xs text-[#37474F]/75 dark:text-[#E5E9EA]/75 leading-relaxed break-words" *ngIf="entry.note">
           {{ entry.note }}

@@ -8,7 +8,23 @@ interface MoodOption {
   emoji: string;
   label: string;
   colorClass: string;
+  dotColor: string;
   value: number;
+  angleDeg: number;
+}
+
+// Dial geometry: semicircle centered at (150,150), radius 120.
+// angleDeg is measured from the positive x-axis (0deg = right/best, 180deg = left/worst).
+const DIAL_CENTER = { x: 150, y: 150 };
+const DIAL_RADIUS = 120;
+const NEEDLE_LENGTH = 96;
+
+function pointOnArc(angleDeg: number, radius: number) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return {
+    x: DIAL_CENTER.x + radius * Math.cos(rad),
+    y: DIAL_CENTER.y - radius * Math.sin(rad)
+  };
 }
 
 @Component({
@@ -18,19 +34,32 @@ interface MoodOption {
   templateUrl: './mood-tracker.component.html'
 })
 export class MoodTrackerComponent implements OnInit {
+  dialCenter = DIAL_CENTER;
+  dialRadius = DIAL_RADIUS;
+
+  // Storm (worst) sits on the left, sun (best) on the right - reads like a weather horizon.
   moods: MoodOption[] = [
-    { emoji: '☀️', label: 'Radiant', colorClass: 'border-[#E8B86D] bg-[#E8B86D]/10 text-[#8A6323] ring-[#E8B86D]', value: 5 },
-    { emoji: '🌱', label: 'Calm', colorClass: 'border-[#A8C5A0] bg-[#A8C5A0]/15 text-[#5C7A56] ring-[#A8C5A0]', value: 4 },
-    { emoji: '☁️', label: 'Tired', colorClass: 'border-[#B8C4C8] bg-[#B8C4C8]/20 text-[#5C6C70] ring-[#B8C4C8]', value: 3 },
-    { emoji: '🌧️', label: 'Anxious', colorClass: 'border-[#88AFCB] bg-[#88AFCB]/12 text-[#3D6889] ring-[#88AFCB]', value: 2 },
-    { emoji: '⛈️', label: 'Overwhelmed', colorClass: 'border-[#A597C4] bg-[#A597C4]/12 text-[#5D4E80] ring-[#A597C4]', value: 1 }
+    { emoji: '⛈️', label: 'Overwhelmed', colorClass: 'text-[#5D4E80] dark:text-[#C3B4E0]', dotColor: '#A597C4', value: 1, angleDeg: 180 },
+    { emoji: '🌧️', label: 'Anxious', colorClass: 'text-[#3D6889] dark:text-[#A9CBE3]', dotColor: '#88AFCB', value: 2, angleDeg: 135 },
+    { emoji: '☁️', label: 'Tired', colorClass: 'text-[#5C6C70] dark:text-[#C7D1D4]', dotColor: '#B8C4C8', value: 3, angleDeg: 90 },
+    { emoji: '🌱', label: 'Calm', colorClass: 'text-[#5C7A56] dark:text-[#C3DABE]', dotColor: '#A8C5A0', value: 4, angleDeg: 45 },
+    { emoji: '☀️', label: 'Radiant', colorClass: 'text-[#8A6323] dark:text-[#F0D19E]', dotColor: '#E8B86D', value: 5, angleDeg: 0 }
   ];
 
-  getSpectrumWidth(): number {
-    if (!this.selectedMood) return 0;
-    const index = this.moods.findIndex(m => m.label === this.selectedMood?.label);
-    const total = this.moods.length - 1;
-    return (index / total) * 100;
+  getTickPosition(mood: MoodOption) {
+    return pointOnArc(mood.angleDeg, this.dialRadius);
+  }
+
+  get needleAngle(): number {
+    return this.selectedMood ? this.selectedMood.angleDeg : 90;
+  }
+
+  get needleEnd() {
+    return pointOnArc(this.needleAngle, NEEDLE_LENGTH);
+  }
+
+  get needleColor(): string {
+    return this.selectedMood ? this.selectedMood.dotColor : '#B8C4C8';
   }
 
   selectedMood: MoodOption | null = null;
