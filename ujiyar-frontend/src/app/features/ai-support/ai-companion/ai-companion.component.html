@@ -1,94 +1,96 @@
-<div class="flex flex-col h-[calc(100vh-12rem)] bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
-  
-  <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-      <div class="h-10 w-10 rounded-xl bg-wellness-primary/10 flex items-center justify-center text-wellness-primary text-xl">
-        🤖
+<div class="flex flex-col h-[calc(100vh-12rem)] bg-white rounded-3xl shadow-sm border border-[#37474F]/5 overflow-hidden">
+
+  <div class="p-5 border-b border-[#37474F]/5 bg-[#FAF8F3]/60 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="h-11 w-11 rounded-2xl bg-[#A8C5A0]/15 flex items-center justify-center text-[#5C7A56] text-xl">
+        🤍
       </div>
       <div>
-        <h3 class="text-sm font-bold text-slate-800">AI Wellness Companion</h3>
-        <p class="text-[11px] text-emerald-600 flex items-center font-medium">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-          Ready to listen
+        <h3 class="text-sm font-semibold text-[#37474F]">Your Wellness Companion</h3>
+        <p class="text-[11px] text-[#6FAFA8] flex items-center font-medium mt-0.5">
+          <span class="h-1.5 w-1.5 rounded-full bg-[#6FAFA8] mr-1.5 animate-breathe"></span>
+          Here, whenever you're ready
         </p>
       </div>
     </div>
-    <span class="text-[10px] bg-slate-100 font-semibold px-2.5 py-1 text-slate-500 rounded-lg">Safe Reflection Zone</span>
+    <span class="text-[10px] bg-[#88AFCB]/10 text-[#3D6889] font-semibold px-3 py-1.5 rounded-xl">Private &amp; Safe</span>
   </div>
 
-  <div class="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50/30">
-    <div *ngFor="let msg of messages" 
-         [class]="msg.sender === 'user' ? 'justify-end' : 'justify-start'" 
-         class="flex items-start gap-3 max-w-full">
-      
-      <div *ngIf="msg.sender === 'ai'" class="h-8 w-8 rounded-lg bg-wellness-primary/10 flex items-center justify-center text-sm shrink-0">
-        🤖
+  <div class="flex-1 p-6 overflow-y-auto space-y-4 bg-[#FAF8F3]/30">
+    <div *ngFor="let msg of messages"
+         [class]="msg.sender === 'user' ? 'justify-end' : 'justify-start'"
+         class="flex items-start gap-3 max-w-full animate-fade-up">
+
+      <div *ngIf="msg.sender === 'ai'" class="h-8 w-8 rounded-xl bg-[#A8C5A0]/15 flex items-center justify-center text-sm shrink-0">
+        🤍
       </div>
 
-      <div [class]="msg.sender === 'user' ? 'bg-slate-900 text-white rounded-br-none' : 'bg-white border border-slate-200/80 text-slate-700 rounded-bl-none'"
-           class="p-3.5 rounded-2xl max-w-lg shadow-xs text-sm leading-relaxed break-words">
+      <div [class]="msg.sender === 'user' ? 'bg-[#6FAFA8] text-white rounded-br-md' : 'bg-white border border-[#37474F]/8 text-[#37474F] rounded-bl-md'"
+           class="p-4 rounded-2xl max-w-lg shadow-sm text-sm leading-relaxed break-words">
         <p>{{ msg.text }}</p>
-        <span [class]="msg.sender === 'user' ? 'text-slate-400' : 'text-slate-400'" 
-              class="block text-[9px] mt-1 text-right font-medium">
+        <span [class]="msg.sender === 'user' ? 'text-white/70' : 'text-[#6B7A80]'"
+              class="block text-[10px] mt-1.5 text-right font-medium">
           {{ msg.timestamp | date:'shortTime' }}
         </span>
       </div>
     </div>
 
-    <div *ngIf="isAiTyping" class="flex items-center gap-3 justify-start animate-pulse">
-      <div class="h-8 w-8 rounded-lg bg-wellness-primary/10 flex items-center justify-center text-sm">🤖</div>
-      <div class="bg-white border border-slate-100 p-4 rounded-2xl rounded-bl-none flex items-center space-x-1">
-        <span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-        <span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-        <span class="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+    <div *ngIf="isAiTyping" class="flex items-center gap-3 justify-start">
+      <div class="h-8 w-8 rounded-xl bg-[#A8C5A0]/15 flex items-center justify-center text-sm">🤍</div>
+      <div class="bg-white border border-[#37474F]/8 p-4 rounded-2xl rounded-bl-md flex items-center gap-1.5">
+        <span class="h-1.5 w-1.5 bg-[#6FAFA8] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+        <span class="h-1.5 w-1.5 bg-[#6FAFA8] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+        <span class="h-1.5 w-1.5 bg-[#6FAFA8] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
       </div>
     </div>
   </div>
 
-  <div class="p-4 border-t border-slate-100 bg-white space-y-3">
-    
-    <div *ngIf="messages.length === 1" class="flex flex-wrap gap-2 animate-fade-in">
-      <button 
+  <div class="p-4 border-t border-[#37474F]/5 bg-white space-y-3">
+
+    <div *ngIf="messages.length === 1" class="flex flex-wrap gap-2 animate-fade-up">
+      <button
         *ngFor="let prompt of starterPrompts"
         (click)="sendMessage(prompt)"
-        class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-2 rounded-xl border border-slate-200/60 transition-all text-left">
-        ✨ "{{ prompt }}"
+        class="text-xs bg-[#FAF8F3] hover:bg-[#A8C5A0]/10 text-[#37474F] px-3.5 py-2.5 rounded-2xl border border-[#37474F]/8 hover:border-[#A8C5A0]/40 transition-all duration-300 text-left">
+        {{ prompt }}
       </button>
     </div>
 
     <form (ngSubmit)="sendMessage()" class="flex items-center gap-3">
-      
+
       <div class="relative flex-1">
-        <input 
+        <input
           type="text"
           [(ngModel)]="newMessageText"
           name="chatMessage"
-          placeholder="Share what is on your mind safely..."
+          placeholder="Share what's on your mind, safely..."
           autocomplete="off"
-          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-wellness-primary/20 focus:border-wellness-primary text-slate-700 text-sm transition pr-12">
-        
-        <button 
+          class="w-full px-4 py-3.5 bg-[#FAF8F3] border border-[#37474F]/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#A8C5A0]/30 focus:border-[#A8C5A0] text-[#37474F] text-sm transition-all duration-300 pr-12 placeholder:text-[#6B7A80]/60">
+
+        <button
           type="button"
           (click)="toggleVoiceRecognition()"
-          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-200 focus:outline-none"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 focus:outline-none"
           [class.text-red-500]="isRecording"
           [class.bg-red-50]="isRecording"
-          [class.animate-pulse]="isRecording"
-          [class.text-slate-400]="!isRecording"
-          [class.hover:bg-slate-200]="!isRecording"
-          [class.hover:text-slate-700]="!isRecording"
+          [class.animate-breathe]="isRecording"
+          [class.text-[#6B7A80]]="!isRecording"
+          [class.hover:bg-[#A8C5A0]/10]="!isRecording"
+          [class.hover:text-[#37474F]]="!isRecording"
           title="Toggle voice dictation">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
           </svg>
         </button>
       </div>
-      
-      <button 
+
+      <button
         type="submit"
         [disabled]="(!newMessageText.trim() && !isRecording) || isAiTyping"
-        class="bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-white font-medium p-3 rounded-xl transition shadow-sm shrink-0 flex items-center justify-center">
-        <span>🚀</span>
+        class="bg-[#A8C5A0] hover:bg-[#8FB088] disabled:opacity-30 text-white p-3.5 rounded-2xl transition-all duration-300 shadow-sm shrink-0 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+        </svg>
       </button>
     </form>
   </div>

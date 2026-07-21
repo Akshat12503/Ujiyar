@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -9,8 +10,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard-layout.component.html'
 })
 export class DashboardLayoutComponent {
-  // Boolean flag controlling profile menu rendering visibility state
   isProfileMenuOpen: boolean = false;
+
+  constructor(public theme: ThemeService) {}
 
   toggleProfileMenu() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
