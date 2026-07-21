@@ -137,13 +137,16 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
         labels: [], datasets: [{
           label: 'Mental Baseline Balance',
           data: [],
-          borderColor: '#16a34a',
-          backgroundColor: 'rgba(22, 163, 74, 0.05)',
+          borderColor: '#6FAFA8',
+          backgroundColor: 'rgba(111, 175, 168, 0.08)',
           borderWidth: 3,
-          tension: 0.35,
+          tension: 0.4,
           fill: true,
-          pointBackgroundColor: '#16a34a',
-          pointRadius: 4
+          pointBackgroundColor: '#6FAFA8',
+          pointBorderColor: '#FFFFFF',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
         }]
       },
       options: {
@@ -155,9 +158,9 @@ export class AnalyticsDashboardComponent implements OnInit, OnDestroy {
             min: 1, max: 5, ticks: {
               stepSize: 1, callback: (value) =>
                 ({ 1: '⛈️', 2: '🌧️', 3: '☁️', 4: '🌱', 5: '☀️' }[Number(value)] || value)
-            }, grid: { color: '#f1f5f9' }
+            }, grid: { color: '#F0EDE4' }
           },
-          x: { grid: { display: false } }
+          x: { grid: { display: false }, ticks: { color: '#6B7A80' } }
         }
       }
     });

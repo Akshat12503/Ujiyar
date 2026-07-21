@@ -19,11 +19,11 @@ interface MoodOption {
 })
 export class MoodTrackerComponent implements OnInit {
   moods: MoodOption[] = [
-    { emoji: '☀️', label: 'Radiant', colorClass: 'border-amber-400 bg-amber-50 text-amber-700', value: 5 },
-    { emoji: '🌱', label: 'Calm', colorClass: 'border-emerald-400 bg-emerald-50 text-emerald-700', value: 4 },
-    { emoji: '☁️', label: 'Tired', colorClass: 'border-slate-300 bg-slate-50 text-slate-600', value: 3 },
-    { emoji: '🌧️', label: 'Anxious', colorClass: 'border-blue-400 bg-blue-50 text-blue-700', value: 2 },
-    { emoji: '⛈️', label: 'Overwhelmed', colorClass: 'border-purple-400 bg-purple-50 text-purple-700', value: 1 }
+    { emoji: '☀️', label: 'Radiant', colorClass: 'border-[#E8B86D] bg-[#E8B86D]/10 text-[#8A6323] ring-[#E8B86D]', value: 5 },
+    { emoji: '🌱', label: 'Calm', colorClass: 'border-[#A8C5A0] bg-[#A8C5A0]/15 text-[#5C7A56] ring-[#A8C5A0]', value: 4 },
+    { emoji: '☁️', label: 'Tired', colorClass: 'border-[#B8C4C8] bg-[#B8C4C8]/20 text-[#5C6C70] ring-[#B8C4C8]', value: 3 },
+    { emoji: '🌧️', label: 'Anxious', colorClass: 'border-[#88AFCB] bg-[#88AFCB]/12 text-[#3D6889] ring-[#88AFCB]', value: 2 },
+    { emoji: '⛈️', label: 'Overwhelmed', colorClass: 'border-[#A597C4] bg-[#A597C4]/12 text-[#5D4E80] ring-[#A597C4]', value: 1 }
   ];
 
   selectedMood: MoodOption | null = null;
